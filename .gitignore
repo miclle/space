@@ -13,3 +13,27 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# misc
+.DS_Store
+
+tmp
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# Log files
+*.log
+
+# config
+*.local.yaml
+
+# testing
+coverage.txt
+coverage.html
