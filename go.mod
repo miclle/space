@@ -6,6 +6,7 @@ require (
 	github.com/fox-gonic/fox v0.0.0-20230222020807-59c7120adbd0
 	golang.org/x/crypto v0.6.0
 	gorm.io/gorm v1.24.5
+	gorm.io/plugin/soft_delete v1.2.0
 )
 
 require (
@@ -43,5 +44,4 @@ require (
 	gorm.io/driver/postgres v1.3.10 // indirect
 	gorm.io/driver/sqlite v1.3.6 // indirect
 	gorm.io/driver/sqlserver v1.3.2 // indirect
-	gorm.io/plugin/soft_delete v1.2.0 // indirect
 )
