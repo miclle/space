@@ -37,3 +37,6 @@ tmp
 # testing
 coverage.txt
 coverage.html
+
+# build app
+cmd/space/space
