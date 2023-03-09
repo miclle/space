@@ -91,9 +91,14 @@ func (s *service) CreateSpace(ctx context.Context, params *params.CreateSpace) (
 			return err
 		}
 
-		space.HomepageID = page.PageID
+		err = tx.Model(space).Update("homepage_id", page.PageID).Error
+		if err != nil {
+			return err
+		}
 
-		return tx.Save(space).Error
+		space.Homepage = page
+
+		return nil
 	})
 
 	return space, err
@@ -118,7 +123,13 @@ func (s *service) DescribeSpaces(ctx context.Context, params *params.DescribeSpa
 	// Pagination
 	database = database.Scopes(pagination.Paginate())
 
-	if err := database.Preload("Homepage").Find(&pagination.Items).Error; err != nil {
+	// TODO(m) preload homepage space lang or fallback lang
+	if err := database.Preload("Homepage", func(db *gorm.DB) *gorm.DB {
+		if params.Lang != "" {
+			db = db.Where("`lang` = ?", params.Lang)
+		}
+		return db
+	}).Find(&pagination.Items).Error; err != nil {
 		return nil, err
 	}
 

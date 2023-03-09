@@ -6,6 +6,8 @@ require (
 	github.com/fox-gonic/fox v0.0.0-20230228032629-f2daabd34f96
 	github.com/longbridgeapp/autocorrect v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.22
+	github.com/samber/lo v1.37.0
+	github.com/stretchr/testify v1.8.2
 	github.com/yuin/goldmark v1.4.13
 	golang.org/x/crypto v0.7.0
 	gorm.io/gorm v1.24.6
@@ -17,6 +19,7 @@ require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.6.5 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.6.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
@@ -39,12 +42,14 @@ require (
 	github.com/paulmach/orb v0.9.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/zerolog v1.29.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/tdewolff/parse/v2 v2.6.5 // indirect
 	go.opentelemetry.io/otel v1.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.14.0 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
