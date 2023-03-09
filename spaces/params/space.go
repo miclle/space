@@ -15,17 +15,22 @@ type CreateSpace struct {
 	Description  string
 	Avatar       string
 	Status       models.SpaceStatus
+	CreatorID    int64
 }
 
 // DescribeSpaces describe spaces params
 type DescribeSpaces struct {
 	database.Pagination[*models.Space]
-	Q string
+	Q       string
+	Lang    string
+	Version string
 }
 
 // DescribeSpace describe space detail params
 type DescribeSpace struct {
-	Key string
+	Key     string
+	Lang    string
+	Version string
 }
 
 // UpdateSpace update space params
