@@ -11,13 +11,13 @@ type Authentication struct {
 	AccountID         int64  `gorm:"uniqueIndex"`                            // Account ID
 	Password          string `json:"-"                  gorm:"-"`            // Password
 	EncryptedPassword []byte `json:"-"                  gorm:"default:NULL"` // Encrypted password
-	CurrentSignInAt   int64  `json:"current_sign_in_at" gorm:"default:NULL"` // Current sign in time
+	CurrentSignInAt   int64  `json:"current_sign_in_at"`                     // Current sign in time
 	CurrentSignInIP   string `json:"current_sign_in_ip" gorm:"size:255"`     // Current sign in ip
-	LastSignInAt      int64  `json:"last_sign_in_at"    gorm:"default:NULL"` // Last sign in time
+	LastSignInAt      int64  `json:"last_sign_in_at"`                        // Last sign in time
 	LastSignInIP      string `json:"last_sign_in_ip"    gorm:"size:255"`     // Last sign in ip
-	FailedAttempts    int    `json:"failed_attempts"    gorm:"default:NULL"` // Failed attempt count
+	FailedAttempts    int    `json:"failed_attempts"`                        // Failed attempt count
 	UnlockToken       string `json:"unlock_token"       gorm:"size:255"`     // Lock token
-	LockedAt          int64  `json:"locked_at"          gorm:"default:NULL"` // Lock at time
+	LockedAt          int64  `json:"locked_at"`                              // Lock at time
 }
 
 // TableName user model table name

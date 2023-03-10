@@ -16,6 +16,8 @@ type Account struct {
 	Email    string `json:"email"    gorm:"size:255"`
 	Bio      string `json:"bio"      gorm:"size:255"`
 	Location string `json:"location" gorm:"size:255"`
+
+	Authentication Authentication `json:"-"`
 }
 
 // TableName user model table name
