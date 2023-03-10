@@ -14,8 +14,8 @@ type Account struct {
 	Login    string `json:"login"    gorm:"uniqueIndex;size:255"`
 	Name     string `json:"name"     gorm:"size:255"`
 	Email    string `json:"email"    gorm:"size:255"`
-	Bio      string `json:"bio"      gorm:"255"`
-	Location string `json:"location" gorm:"255"`
+	Bio      string `json:"bio"      gorm:"size:255"`
+	Location string `json:"location" gorm:"size:255"`
 }
 
 // TableName user model table name
