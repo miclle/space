@@ -18,6 +18,8 @@ type Authentication struct {
 	FailedAttempts    int    `json:"failed_attempts"`                        // Failed attempt count
 	UnlockToken       string `json:"unlock_token"       gorm:"size:255"`     // Lock token
 	LockedAt          int64  `json:"locked_at"`                              // Lock at time
+	ResetToken        string `json:"reset_token"        gorm:"size:255"`     // Reset token
+	ResetAt           int64  `json:"reset_at"`                               // Reset at time
 }
 
 // TableName user model table name

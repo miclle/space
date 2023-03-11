@@ -44,15 +44,16 @@ type UpdateAccount struct {
 
 // UpdatePassword update password params
 type UpdatePassword struct {
-	ID                   int64
-	Login                string
-	OldPassword          string
-	Password             string
-	PasswordConfirmation string
+	ID          int64
+	Login       string
+	Password    string
+	NewPassword string
 }
 
 // ResetPassword reset password params
 type ResetPassword struct {
-	ID    int64
-	Login string
+	ID       int64
+	Login    string
+	Token    string
+	Password string
 }

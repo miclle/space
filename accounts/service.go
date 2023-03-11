@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/fox-gonic/fox/database"
 	"github.com/miclle/space/accounts/params"
@@ -142,21 +143,77 @@ func (s *service) AuthenticateAccount(ctx context.Context, params *params.Authen
 		return nil, err
 	}
 
-	if err := bcrypt.CompareHashAndPassword(account.Authentication.EncryptedPassword, []byte(params.Password)); err != nil {
+	authentication := account.Authentication
+
+	if err := bcrypt.CompareHashAndPassword(authentication.EncryptedPassword, []byte(params.Password)); err != nil {
+		authentication.FailedAttempts++
+		database.Save(authentication)
 		return nil, errors.New(http.StatusText(http.StatusUnauthorized))
 	}
 
-	return nil, nil
+	authentication.FailedAttempts = 0
+	authentication.LastSignInAt = authentication.CurrentSignInAt
+	authentication.LastSignInIP = authentication.CurrentSignInIP
+	authentication.CurrentSignInAt = time.Now().Unix()
+	authentication.CurrentSignInIP = params.ClientIP
+
+	database.Save(authentication)
+
+	return account, nil
 }
 
 func (s *service) UpdateAccount(ctx context.Context, params *params.UpdateAccount) (*models.Account, error) {
-	return nil, nil
+	var (
+		database = s.Database.WithContext(ctx)
+		account  *models.Account
+	)
+
+	err := database.Where("`login` = ?", params.Login).First(&account).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if params.Name != nil {
+		account.Name = *params.Name
+	}
+	if params.Bio != nil {
+		account.Bio = *params.Bio
+	}
+	if params.Location != nil {
+		account.Location = *params.Location
+	}
+
+	err = database.Save(account).Error
+
+	return account, err
 }
 
 func (s *service) UpdatePassword(ctx context.Context, params *params.UpdatePassword) error {
-	return nil
+	var (
+		database = s.Database.WithContext(ctx)
+		account  *models.Account
+	)
+
+	err := database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
+	if err != nil {
+		return err
+	}
+
+	authentication := account.Authentication
+
+	if err := bcrypt.CompareHashAndPassword(authentication.EncryptedPassword, []byte(params.Password)); err != nil {
+		return errors.New(http.StatusText(http.StatusUnauthorized))
+	}
+
+	authentication.EncryptedPassword, err = bcrypt.GenerateFromPassword([]byte(params.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	return database.Save(authentication).Error
 }
 
 func (s *service) ResetPassword(ctx context.Context, params *params.ResetPassword) error {
+	// TODO(m)
 	return nil
 }
