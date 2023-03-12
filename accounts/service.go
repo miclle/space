@@ -23,7 +23,12 @@ type Service interface {
 	AuthenticateAccount(ctx context.Context, params *params.AuthenticateAccount) (account *models.Account, err error)
 	UpdateAccount(ctx context.Context, params *params.UpdateAccount) (account *models.Account, err error)
 
+	CreateUnlockToken(ctx context.Context, params *params.CreateUnlockToken) (token string, err error)
+	Unlock(ctx context.Context, params *params.Unlock) (err error)
+
 	UpdatePassword(ctx context.Context, params *params.UpdatePassword) (err error)
+
+	CreateResetPasswordToken(ctx context.Context, params *params.ResetPassword) (token string, err error)
 	ResetPassword(ctx context.Context, params *params.ResetPassword) (err error)
 }
 
@@ -188,6 +193,15 @@ func (s *service) UpdateAccount(ctx context.Context, params *params.UpdateAccoun
 	return account, err
 }
 
+func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUnlockToken) (token string, err error) {
+	// TODO(m)
+	return "", nil
+}
+func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error) {
+	// TODO(m)
+	return nil
+}
+
 func (s *service) UpdatePassword(ctx context.Context, params *params.UpdatePassword) error {
 	var (
 		database = s.Database.WithContext(ctx)
@@ -211,6 +225,11 @@ func (s *service) UpdatePassword(ctx context.Context, params *params.UpdatePassw
 	}
 
 	return database.Save(authentication).Error
+}
+
+func (s *service) CreateResetPasswordToken(ctx context.Context, params *params.ResetPassword) (token string, err error) {
+	// TODO(m)
+	return "", nil
 }
 
 func (s *service) ResetPassword(ctx context.Context, params *params.ResetPassword) error {

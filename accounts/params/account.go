@@ -42,6 +42,17 @@ type UpdateAccount struct {
 	Location *string
 }
 
+// CreateUnlockToken create unlock account token params
+type CreateUnlockToken struct {
+	Login string
+}
+
+// Unlock account token
+type Unlock struct {
+	Login string
+	Token string
+}
+
 // UpdatePassword update password params
 type UpdatePassword struct {
 	ID          int64
@@ -50,9 +61,13 @@ type UpdatePassword struct {
 	NewPassword string
 }
 
+// CreateResetPasswordToken create reset account password token params
+type CreateResetPasswordToken struct {
+	Login string
+}
+
 // ResetPassword reset password params
 type ResetPassword struct {
-	ID       int64
 	Login    string
 	Token    string
 	Password string
