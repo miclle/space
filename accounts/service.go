@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/fox-gonic/fox/database"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"github.com/miclle/space/accounts/params"
 	"github.com/miclle/space/models"
 	"golang.org/x/crypto/bcrypt"
@@ -194,9 +196,44 @@ func (s *service) UpdateAccount(ctx context.Context, params *params.UpdateAccoun
 }
 
 func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUnlockToken) (token string, err error) {
-	// TODO(m)
-	return "", nil
+	var (
+		database = s.Database.WithContext(ctx)
+		account  *models.Account
+
+		id  = uuid.New().String()
+		now = jwt.NewNumericDate(time.Now())
+		t   = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+			Issuer:    id,
+			IssuedAt:  now,
+			NotBefore: now,
+			ExpiresAt: &jwt.NumericDate{Time: now.Add(time.Hour * 24)},
+		})
+	)
+
+	err = database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
+	if err != nil {
+		return "", err
+	}
+
+	err = database.Transaction(func(tx *gorm.DB) error {
+
+		encryptedToken, err := bcrypt.GenerateFromPassword([]byte(id), bcrypt.DefaultCost)
+		tx.Model(account.Authentication).UpdateColumn("unlock_token", encryptedToken)
+
+		token, err = t.SignedString("hmacSecret")
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return
 }
+
 func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error) {
 	// TODO(m)
 	return nil
