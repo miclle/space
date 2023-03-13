@@ -84,6 +84,7 @@ func TestCreateAccount(t *testing.T) {
 		Name:     "Lisa",
 	})
 	assert.NotNil(err)
+	assert.Nil(account)
 }
 
 func TestDescribeAccounts(t *testing.T) {

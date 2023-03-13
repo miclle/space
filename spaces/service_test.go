@@ -83,6 +83,7 @@ func TestCreateSpace(t *testing.T) {
 		Lang:   "en-US",
 	})
 	assert.NotNil(err)
+	assert.Nil(space)
 }
 
 func TestDescribeSpaces(t *testing.T) {

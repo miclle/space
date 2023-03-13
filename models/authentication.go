@@ -30,6 +30,5 @@ func (Authentication) TableName() string {
 // BeforeCreate gorm before create callback
 func (auth *Authentication) BeforeCreate(tx *gorm.DB) (err error) {
 	auth.EncryptedPassword, err = bcrypt.GenerateFromPassword([]byte(auth.Password), bcrypt.DefaultCost)
-	tx.AddError(err)
 	return
 }

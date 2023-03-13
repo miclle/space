@@ -101,7 +101,11 @@ func (s *service) CreateSpace(ctx context.Context, params *params.CreateSpace) (
 		return nil
 	})
 
-	return space, err
+	if err != nil {
+		return nil, err
+	}
+
+	return space, nil
 }
 
 func (s *service) DescribeSpaces(ctx context.Context, params *params.DescribeSpaces) (*database.Pagination[*models.Space], error) {
