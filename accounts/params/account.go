@@ -1,8 +1,15 @@
 package params
 
 import (
+	"errors"
+
 	"github.com/fox-gonic/fox/database"
 	"github.com/miclle/space/models"
+)
+
+var (
+	// ErrDescribeAccountParamsInvalid describe account params invalid
+	ErrDescribeAccountParamsInvalid = errors.New("describe account params invalid")
 )
 
 // CreateAccount create account params
@@ -25,6 +32,14 @@ type DescribeAccounts struct {
 type DescribeAccount struct {
 	ID    int64
 	Login string
+}
+
+// IsValid return describe account params is valid
+func (params *DescribeAccount) IsValid() error {
+	if params.ID == 0 && len(params.Login) == 0 {
+		return ErrDescribeAccountParamsInvalid
+	}
+	return nil
 }
 
 // AuthenticateAccount authenticate account params

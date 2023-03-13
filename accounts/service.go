@@ -9,13 +9,18 @@ import (
 	"time"
 
 	"github.com/fox-gonic/fox/database"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"github.com/miclle/space/accounts/params"
-	"github.com/miclle/space/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+
+	"github.com/miclle/space/accounts/params"
+	"github.com/miclle/space/models"
 )
+
+// validate global validator
+var validate = validator.New()
 
 // Service for account interface
 type Service interface {
@@ -56,6 +61,10 @@ func (s *service) CreateAccount(ctx context.Context, params *params.CreateAccoun
 		account  *models.Account
 	)
 
+	if err := validate.Struct(params); err != nil {
+		return nil, err
+	}
+
 	err := database.Transaction(func(tx *gorm.DB) error {
 
 		account = &models.Account{
@@ -95,7 +104,7 @@ func (s *service) DescribeAccounts(ctx context.Context, params *params.DescribeA
 
 	if q := strings.TrimSpace(params.Q); q != "" {
 		like := fmt.Sprintf("%%%s%%", q)
-		database = database.Where("`accounts`.`name` LIKE ? OR `accounts`.`email` LIKE ?", like, like)
+		database = database.Where("`accounts`.`login` LIKE ? OR `accounts`.`name` LIKE ? OR `accounts`.`email` LIKE ?", like, like, like)
 	}
 
 	if err := database.Model(&pagination.Items).Count(&pagination.Total).Error; err != nil {
@@ -118,8 +127,8 @@ func (s *service) DescribeAccount(ctx context.Context, params *params.DescribeAc
 		account  *models.Account
 	)
 
-	if params.ID == 0 && len(params.Login) == 0 {
-		return nil, errors.New("describe account params invalid")
+	if err := params.IsValid(); err != nil {
+		return nil, err
 	}
 
 	if params.ID > 0 {
@@ -147,6 +156,9 @@ func (s *service) AuthenticateAccount(ctx context.Context, params *params.Authen
 
 	err := database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(http.StatusText(http.StatusUnauthorized))
+		}
 		return nil, err
 	}
 
@@ -199,15 +211,6 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 	var (
 		database = s.Database.WithContext(ctx)
 		account  *models.Account
-
-		id  = uuid.New().String()
-		now = jwt.NewNumericDate(time.Now())
-		t   = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-			Issuer:    id,
-			IssuedAt:  now,
-			NotBefore: now,
-			ExpiresAt: &jwt.NumericDate{Time: now.Add(time.Hour * 24)},
-		})
 	)
 
 	err = database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
@@ -216,11 +219,29 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 	}
 
 	err = database.Transaction(func(tx *gorm.DB) error {
+		var (
+			password = uuid.New().String()
+			now      = jwt.NewNumericDate(time.Now())
+			t        = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+				Issuer:    params.Login,
+				Subject:   password,
+				IssuedAt:  now,
+				NotBefore: now,
+				ExpiresAt: &jwt.NumericDate{Time: now.Add(time.Hour * 24)},
+			})
+		)
 
-		encryptedToken, err := bcrypt.GenerateFromPassword([]byte(id), bcrypt.DefaultCost)
-		tx.Model(account.Authentication).UpdateColumn("unlock_token", encryptedToken)
+		encryptedToken, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
 
-		token, err = t.SignedString("hmacSecret")
+		err = tx.Model(account.Authentication).UpdateColumn("unlock_token", encryptedToken).Error
+		if err != nil {
+			return err
+		}
+
+		token, err = t.SignedString([]byte("unlock"))
 		if err != nil {
 			return err
 		}
@@ -235,7 +256,26 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 }
 
 func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error) {
-	// TODO(m)
+
+	token, err := jwt.Parse(params.Token, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		// if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		// 	return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		// }
+		return []byte("unlock"), nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	claims, ok := token.Claims.(jwt.RegisteredClaims)
+	if ok && token.Valid {
+		fmt.Printf("claims: %+v\n", claims)
+	} else {
+		fmt.Println(err)
+	}
+
 	return nil
 }
 

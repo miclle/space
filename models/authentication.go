@@ -16,9 +16,9 @@ type Authentication struct {
 	LastSignInAt      int64  `json:"last_sign_in_at"`                        // Last sign in time
 	LastSignInIP      string `json:"last_sign_in_ip"    gorm:"size:255"`     // Last sign in ip
 	FailedAttempts    int    `json:"failed_attempts"`                        // Failed attempt count
-	UnlockToken       string `json:"unlock_token"       gorm:"size:255"`     // Lock token
+	UnlockToken       []byte `json:"unlock_token"       gorm:"default:NULL"` // Lock token
 	LockedAt          int64  `json:"locked_at"`                              // Lock at time
-	ResetToken        string `json:"reset_token"        gorm:"size:255"`     // Reset token
+	ResetToken        []byte `json:"reset_token"        gorm:"default:NULL"` // Reset token
 	ResetAt           int64  `json:"reset_at"`                               // Reset at time
 }
 
