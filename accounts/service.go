@@ -213,7 +213,7 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 		account  *models.Account
 	)
 
-	err = database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
+	err = database.Preload("Authentication").Where("`email` = ?", params.Email).First(&account).Error
 	if err != nil {
 		return "", err
 	}
@@ -223,11 +223,9 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 			password = uuid.New().String()
 			now      = jwt.NewNumericDate(time.Now())
 			t        = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-				Issuer:    params.Login,
+				Issuer:    params.Email,
 				Subject:   password,
-				IssuedAt:  now,
-				NotBefore: now,
-				ExpiresAt: &jwt.NumericDate{Time: now.Add(time.Hour * 24)},
+				ExpiresAt: &jwt.NumericDate{Time: now.Add(time.Minute * 30)},
 			})
 		)
 

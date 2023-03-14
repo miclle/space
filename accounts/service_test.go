@@ -183,7 +183,7 @@ func TestCreateUnlockToken(t *testing.T) {
 	assert := assert.New(t)
 
 	token, err := accounter.CreateUnlockToken(context.Background(), &params.CreateUnlockToken{
-		Login: "lisa",
+		Email: "lisa@domain.local",
 	})
 	assert.Nil(err)
 	assert.NotEmpty(token)

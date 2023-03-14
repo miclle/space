@@ -12,8 +12,8 @@ import (
 type Account struct {
 	database.Model
 	Login    string `json:"login"    gorm:"uniqueIndex;size:255"`
+	Email    string `json:"email"    gorm:"uniqueIndex;size:255"`
 	Name     string `json:"name"     gorm:"size:255"`
-	Email    string `json:"email"    gorm:"size:255"`
 	Bio      string `json:"bio"      gorm:"size:255"`
 	Location string `json:"location" gorm:"size:255"`
 

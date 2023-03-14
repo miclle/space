@@ -59,7 +59,7 @@ type UpdateAccount struct {
 
 // CreateUnlockToken create unlock account token params
 type CreateUnlockToken struct {
-	Login string
+	Email string
 }
 
 // Unlock account token
