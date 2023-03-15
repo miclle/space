@@ -187,6 +187,8 @@ func TestCreateUnlockToken(t *testing.T) {
 	})
 	assert.Nil(err)
 	assert.NotEmpty(token)
+
+	fmt.Println("token", token)
 }
 
 func TestUnlock(t *testing.T) {

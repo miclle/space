@@ -6,9 +6,9 @@ require (
 	github.com/fox-gonic/fox v0.0.0-20230228032629-f2daabd34f96
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/google/uuid v1.3.0
 	github.com/longbridgeapp/autocorrect v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.22
+	github.com/oklog/ulid/v2 v2.1.0
 	github.com/samber/lo v1.37.0
 	github.com/stretchr/testify v1.8.2
 	github.com/yuin/goldmark v1.4.13
@@ -30,6 +30,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"github.com/fox-gonic/fox/database"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
+	"github.com/oklog/ulid/v2"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
@@ -207,60 +208,67 @@ func (s *service) UpdateAccount(ctx context.Context, params *params.UpdateAccoun
 	return account, err
 }
 
-func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUnlockToken) (token string, err error) {
+func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUnlockToken) (string, error) {
 	var (
 		database = s.Database.WithContext(ctx)
 		account  *models.Account
 	)
 
-	err = database.Preload("Authentication").Where("`email` = ?", params.Email).First(&account).Error
+	err := database.Preload("Authentication").Where("`email` = ?", params.Email).First(&account).Error
 	if err != nil {
 		return "", err
 	}
 
-	err = database.Transaction(func(tx *gorm.DB) error {
-		var (
-			password = uuid.New().String()
-			now      = jwt.NewNumericDate(time.Now())
-			t        = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-				Issuer:    params.Email,
-				Subject:   password,
-				ExpiresAt: &jwt.NumericDate{Time: now.Add(time.Minute * 30)},
-			})
-		)
+	var (
+		password = ulid.Make().String()
+		t        = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+			Issuer: params.Email,
+			ID:     password,
+		})
+	)
 
-		encryptedToken, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-
-		err = tx.Model(account.Authentication).UpdateColumn("unlock_token", encryptedToken).Error
-		if err != nil {
-			return err
-		}
-
-		token, err = t.SignedString([]byte("unlock"))
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
+	signedStr, err := t.SignedString([]byte("unlock_token"))
 	if err != nil {
 		return "", err
 	}
 
-	return
+	encryptedToken, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	// save unlock token encrypted hash
+	err = database.Model(account.Authentication).UpdateColumn("unlock_token", encryptedToken).Error
+	if err != nil {
+		return "", err
+	}
+
+	segs := strings.Split(signedStr, ".")
+
+	return strings.Join(segs[1:], "."), nil
 }
 
 func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error) {
 
-	token, err := jwt.Parse(params.Token, func(token *jwt.Token) (interface{}, error) {
+	header := map[string]interface{}{
+		"typ": "JWT",
+		"alg": jwt.SigningMethodHS256.Alg(),
+	}
+
+	jsonValue, err := json.Marshal(header)
+	if err != nil {
+		return err
+	}
+
+	seg := jwt.EncodeSegment(jsonValue)
+	tokenString := fmt.Sprintf("%s.%s", seg, params.Token)
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		// if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		// 	return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		// }
-		return []byte("unlock"), nil
+		return []byte("unlock_token"), nil
 	})
 
 	if err != nil {
@@ -273,6 +281,8 @@ func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error)
 	} else {
 		fmt.Println(err)
 	}
+
+	// ulid.Make().Time()
 
 	return nil
 }
