@@ -23,6 +23,9 @@ import (
 // validate global validator
 var validate = validator.New()
 
+// UnlockTokenKey unlock token key
+var UnlockTokenKey = "unlock_token"
+
 // Service for account interface
 type Service interface {
 	CreateAccount(ctx context.Context, params *params.CreateAccount) (account *models.Account, err error)
@@ -227,7 +230,7 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 		})
 	)
 
-	signedStr, err := t.SignedString([]byte("unlock_token"))
+	signedStr, err := t.SignedString([]byte(UnlockTokenKey))
 	if err != nil {
 		return "", err
 	}
@@ -238,7 +241,7 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 	}
 
 	// save unlock token encrypted hash
-	err = database.Model(account.Authentication).UpdateColumn("unlock_token", encryptedToken).Error
+	err = database.Model(account.Authentication).Update("unlock_token", encryptedToken).Error
 	if err != nil {
 		return "", err
 	}
@@ -260,29 +263,46 @@ func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error)
 		return err
 	}
 
-	seg := jwt.EncodeSegment(jsonValue)
-	tokenString := fmt.Sprintf("%s.%s", seg, params.Token)
+	var (
+		seg         = jwt.EncodeSegment(jsonValue)
+		tokenString = fmt.Sprintf("%s.%s", seg, params.Token)
+	)
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		// if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		// 	return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		// }
-		return []byte("unlock_token"), nil
+		return []byte(UnlockTokenKey), nil
 	})
-
 	if err != nil {
 		return err
 	}
 
 	claims, ok := token.Claims.(jwt.RegisteredClaims)
-	if ok && token.Valid {
-		fmt.Printf("claims: %+v\n", claims)
-	} else {
-		fmt.Println(err)
+	if !ok || token == nil || !token.Valid {
+		return err
 	}
 
-	// ulid.Make().Time()
+	var (
+		database = s.Database.WithContext(ctx)
+		account  *models.Account
+	)
+
+	err = database.Preload("Authentication").Where("`email` = ?", claims.Issuer).First(&account).Error
+	if err != nil {
+		return err
+	}
+
+	var updates = map[string]interface{}{
+		"failed_attempts": 0,
+		"unlock_token":    nil,
+		"locked_at":       0,
+	}
+	err = database.Model(account.Authentication).Updates(updates).Error
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

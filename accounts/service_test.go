@@ -188,7 +188,11 @@ func TestCreateUnlockToken(t *testing.T) {
 	assert.Nil(err)
 	assert.NotEmpty(token)
 
-	fmt.Println("token", token)
+	err = accounter.Unlock(context.Background(), &params.Unlock{
+		Token: token,
+	})
+
+	assert.Nil(err)
 }
 
 func TestUnlock(t *testing.T) {
