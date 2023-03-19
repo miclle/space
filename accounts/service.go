@@ -309,16 +309,35 @@ func (s *service) UpdatePassword(ctx context.Context, params *params.UpdatePassw
 		account  *models.Account
 	)
 
-	err := database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
+	if len(params.NewPassword) == 0 {
+		return errors.New("new passowrd is invalid")
+	}
+
+	if params.ID > 0 {
+		database = database.Where("`id` = ?", params.ID)
+	}
+
+	if len(params.Login) > 0 {
+		database = database.Where("`login` = ?", params.Login)
+	}
+
+	if len(params.Email) > 0 {
+		database = database.Where("`email` = ?", params.Email)
+	}
+
+	err := database.Preload("Authentication").First(&account).Error
 	if err != nil {
 		return err
 	}
 
-	authentication := account.Authentication
+	fmt.Println("password", params.Password, params.NewPassword)
 
+	authentication := account.Authentication
 	if err := bcrypt.CompareHashAndPassword(authentication.EncryptedPassword, []byte(params.Password)); err != nil {
 		return errors.New(http.StatusText(http.StatusUnauthorized))
 	}
+
+	database = s.Database.WithContext(ctx)
 
 	authentication.EncryptedPassword, err = bcrypt.GenerateFromPassword([]byte(params.NewPassword), bcrypt.DefaultCost)
 	if err != nil {

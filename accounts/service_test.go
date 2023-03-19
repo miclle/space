@@ -203,7 +203,25 @@ func TestCreateUnlock(t *testing.T) {
 }
 
 func TestUpdatePassword(t *testing.T) {
-	// TODO(m)
+	assert := assert.New(t)
+
+	err := accounter.UpdatePassword(context.Background(), &params.UpdatePassword{})
+	assert.NotNil(err)
+
+	err = accounter.UpdatePassword(context.Background(), &params.UpdatePassword{
+		Login:    "lisa",
+		Email:    "lisa@domain.local",
+		Password: "lisa_Password",
+	})
+	assert.NotNil(err)
+
+	err = accounter.UpdatePassword(context.Background(), &params.UpdatePassword{
+		Login:       "lisa",
+		Email:       "lisa@domain.local",
+		Password:    "lisa_Password",
+		NewPassword: "lisa_Password_update",
+	})
+	assert.Nil(err)
 }
 
 func TestCreateResetPasswordToken(t *testing.T) {
