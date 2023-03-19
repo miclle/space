@@ -32,11 +32,12 @@ type DescribeAccounts struct {
 type DescribeAccount struct {
 	ID    int64
 	Login string
+	Email string
 }
 
 // IsValid return describe account params is valid
 func (params *DescribeAccount) IsValid() error {
-	if params.ID == 0 && len(params.Login) == 0 {
+	if params.ID == 0 && len(params.Login) == 0 && len(params.Email) == 0 {
 		return ErrDescribeAccountParamsInvalid
 	}
 	return nil

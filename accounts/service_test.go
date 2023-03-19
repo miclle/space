@@ -179,7 +179,7 @@ func TestUpdateAccount(t *testing.T) {
 	assert.Equal("Mona Lisa", account.Name)
 }
 
-func TestCreateUnlockToken(t *testing.T) {
+func TestCreateUnlock(t *testing.T) {
 	assert := assert.New(t)
 
 	token, err := accounter.CreateUnlockToken(context.Background(), &params.CreateUnlockToken{
@@ -193,10 +193,13 @@ func TestCreateUnlockToken(t *testing.T) {
 	})
 
 	assert.Nil(err)
-}
 
-func TestUnlock(t *testing.T) {
-	// TODO(m)
+	account, err := accounter.DescribeAccount(context.Background(), &params.DescribeAccount{
+		Email: "lisa@domain.local",
+	})
+	assert.Nil(err)
+	assert.Equal(0, account.Authentication.FailedAttempts)
+	assert.Nil(account.Authentication.UnlockToken)
 }
 
 func TestUpdatePassword(t *testing.T) {

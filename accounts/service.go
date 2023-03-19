@@ -143,7 +143,11 @@ func (s *service) DescribeAccount(ctx context.Context, params *params.DescribeAc
 		database = database.Where("`login` = ?", params.Login)
 	}
 
-	err := database.First(&account).Error
+	if len(params.Email) > 0 {
+		database = database.Where("`email` = ?", params.Email)
+	}
+
+	err := database.Preload("Authentication").First(&account).Error
 	if err != nil {
 		return nil, err
 	}
@@ -268,20 +272,12 @@ func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error)
 		tokenString = fmt.Sprintf("%s.%s", seg, params.Token)
 	)
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		// if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		// 	return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		// }
+	claims := jwt.RegisteredClaims{}
+	_, err = jwt.ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(UnlockTokenKey), nil
 	})
 	if err != nil {
-		return err
-	}
-
-	claims, ok := token.Claims.(jwt.RegisteredClaims)
-	if !ok || token == nil || !token.Valid {
-		return err
+		return
 	}
 
 	var (
