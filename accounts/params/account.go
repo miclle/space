@@ -46,6 +46,7 @@ func (params *DescribeAccount) IsValid() error {
 // AuthenticateAccount authenticate account params
 type AuthenticateAccount struct {
 	Login    string
+	Email    string
 	Password string
 	ClientIP string
 }
@@ -80,12 +81,11 @@ type UpdatePassword struct {
 
 // CreateResetPasswordToken create reset account password token params
 type CreateResetPasswordToken struct {
-	Login string
+	Email string
 }
 
 // ResetPassword reset password params
 type ResetPassword struct {
-	Login    string
 	Token    string
 	Password string
 }

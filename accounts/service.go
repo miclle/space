@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,8 +24,19 @@ import (
 // validate global validator
 var validate = validator.New()
 
-// UnlockTokenKey unlock token key
-var UnlockTokenKey = "unlock_token"
+var (
+	// SigningMethod jwt signing method
+	SigningMethod *jwt.SigningMethodHMAC = jwt.SigningMethodHS256
+
+	// TokenExpires token expires duration
+	TokenExpires time.Duration = time.Minute * 15
+
+	// UnlockTokenKey unlock token key
+	UnlockTokenKey = "__unlock_token__"
+
+	// ResetPasswordTokenKey reset password token key
+	ResetPasswordTokenKey = "__reset_password_token__"
+)
 
 // Service for account interface
 type Service interface {
@@ -39,7 +51,7 @@ type Service interface {
 
 	UpdatePassword(ctx context.Context, params *params.UpdatePassword) (err error)
 
-	CreateResetPasswordToken(ctx context.Context, params *params.ResetPassword) (token string, err error)
+	CreateResetPasswordToken(ctx context.Context, params *params.CreateResetPasswordToken) (token string, err error)
 	ResetPassword(ctx context.Context, params *params.ResetPassword) (err error)
 }
 
@@ -162,7 +174,19 @@ func (s *service) AuthenticateAccount(ctx context.Context, params *params.Authen
 		account  *models.Account
 	)
 
-	err := database.Preload("Authentication").Where("`login` = ?", params.Login).First(&account).Error
+	if len(params.Login) == 0 && len(params.Email) == 0 {
+		return nil, errors.New(http.StatusText(http.StatusUnauthorized))
+	}
+
+	if len(params.Login) > 0 {
+		database = database.Where("`login` = ?", params.Login)
+	}
+
+	if len(params.Email) > 0 {
+		database = database.Where("`email` = ?", params.Email)
+	}
+
+	err := database.Preload("Authentication").First(&account).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New(http.StatusText(http.StatusUnauthorized))
@@ -170,6 +194,7 @@ func (s *service) AuthenticateAccount(ctx context.Context, params *params.Authen
 		return nil, err
 	}
 
+	database = s.Database.WithContext(ctx)
 	authentication := account.Authentication
 
 	if err := bcrypt.CompareHashAndPassword(authentication.EncryptedPassword, []byte(params.Password)); err != nil {
@@ -184,7 +209,9 @@ func (s *service) AuthenticateAccount(ctx context.Context, params *params.Authen
 	authentication.CurrentSignInAt = time.Now().Unix()
 	authentication.CurrentSignInIP = params.ClientIP
 
-	database.Save(authentication)
+	if err := database.Save(authentication).Error; err != nil {
+		return nil, err
+	}
 
 	return account, nil
 }
@@ -228,9 +255,10 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 
 	var (
 		password = ulid.Make().String()
-		t        = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-			Issuer: params.Email,
-			ID:     password,
+		t        = jwt.NewWithClaims(SigningMethod, jwt.RegisteredClaims{
+			Issuer:    params.Email,
+			ID:        password,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExpires)),
 		})
 	)
 
@@ -250,16 +278,19 @@ func (s *service) CreateUnlockToken(ctx context.Context, params *params.CreateUn
 		return "", err
 	}
 
-	segs := strings.Split(signedStr, ".")
+	var (
+		segs  = strings.Split(signedStr, ".")
+		token = strings.Join(segs[1:], ".")
+	)
 
-	return strings.Join(segs[1:], "."), nil
+	return base64.RawURLEncoding.EncodeToString([]byte(token)), nil
 }
 
 func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error) {
 
 	header := map[string]interface{}{
 		"typ": "JWT",
-		"alg": jwt.SigningMethodHS256.Alg(),
+		"alg": SigningMethod.Alg(),
 	}
 
 	jsonValue, err := json.Marshal(header)
@@ -267,9 +298,14 @@ func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error)
 		return err
 	}
 
+	tokenBytes, err := base64.RawURLEncoding.DecodeString(params.Token)
+	if err != nil {
+		return err
+	}
+
 	var (
 		seg         = jwt.EncodeSegment(jsonValue)
-		tokenString = fmt.Sprintf("%s.%s", seg, params.Token)
+		tokenString = fmt.Sprintf("%s.%s", seg, string(tokenBytes))
 	)
 
 	claims := jwt.RegisteredClaims{}
@@ -288,6 +324,10 @@ func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error)
 	err = database.Preload("Authentication").Where("`email` = ?", claims.Issuer).First(&account).Error
 	if err != nil {
 		return err
+	}
+
+	if err := bcrypt.CompareHashAndPassword(account.Authentication.UnlockToken, []byte(claims.ID)); err != nil {
+		return errors.New(http.StatusText(http.StatusUnauthorized))
 	}
 
 	var updates = map[string]interface{}{
@@ -330,8 +370,6 @@ func (s *service) UpdatePassword(ctx context.Context, params *params.UpdatePassw
 		return err
 	}
 
-	fmt.Println("password", params.Password, params.NewPassword)
-
 	authentication := account.Authentication
 	if err := bcrypt.CompareHashAndPassword(authentication.EncryptedPassword, []byte(params.Password)); err != nil {
 		return errors.New(http.StatusText(http.StatusUnauthorized))
@@ -347,12 +385,105 @@ func (s *service) UpdatePassword(ctx context.Context, params *params.UpdatePassw
 	return database.Save(authentication).Error
 }
 
-func (s *service) CreateResetPasswordToken(ctx context.Context, params *params.ResetPassword) (token string, err error) {
-	// TODO(m)
-	return "", nil
+func (s *service) CreateResetPasswordToken(ctx context.Context, params *params.CreateResetPasswordToken) (string, error) {
+	var (
+		database = s.Database.WithContext(ctx)
+		account  *models.Account
+	)
+
+	err := database.Preload("Authentication").Where("`email` = ?", params.Email).First(&account).Error
+	if err != nil {
+		return "", err
+	}
+
+	var (
+		password = ulid.Make().String()
+		t        = jwt.NewWithClaims(SigningMethod, jwt.RegisteredClaims{
+			Issuer:    params.Email,
+			ID:        password,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExpires)),
+		})
+	)
+
+	signedStr, err := t.SignedString([]byte(ResetPasswordTokenKey))
+	if err != nil {
+		return "", err
+	}
+
+	encryptedToken, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	// save reset token encrypted hash
+	err = database.Model(account.Authentication).Update("reset_token", encryptedToken).Error
+	if err != nil {
+		return "", err
+	}
+
+	var (
+		segs  = strings.Split(signedStr, ".")
+		token = strings.Join(segs[1:], ".")
+	)
+
+	return base64.RawURLEncoding.EncodeToString([]byte(token)), nil
 }
 
 func (s *service) ResetPassword(ctx context.Context, params *params.ResetPassword) error {
-	// TODO(m)
+	header := map[string]interface{}{
+		"typ": "JWT",
+		"alg": SigningMethod.Alg(),
+	}
+
+	jsonValue, err := json.Marshal(header)
+	if err != nil {
+		return err
+	}
+
+	tokenBytes, err := base64.RawURLEncoding.DecodeString(params.Token)
+	if err != nil {
+		return err
+	}
+
+	var (
+		seg         = jwt.EncodeSegment(jsonValue)
+		tokenString = fmt.Sprintf("%s.%s", seg, string(tokenBytes))
+	)
+
+	claims := jwt.RegisteredClaims{}
+	_, err = jwt.ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface{}, error) {
+		return []byte(ResetPasswordTokenKey), nil
+	})
+	if err != nil {
+		return err
+	}
+
+	var (
+		database = s.Database.WithContext(ctx)
+		account  *models.Account
+	)
+
+	err = database.Preload("Authentication").Where("`email` = ?", claims.Issuer).First(&account).Error
+	if err != nil {
+		return err
+	}
+
+	if err := bcrypt.CompareHashAndPassword(account.Authentication.ResetToken, []byte(claims.ID)); err != nil {
+		return errors.New(http.StatusText(http.StatusUnauthorized))
+	}
+
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	var updates = map[string]interface{}{
+		"encrypted_password": encryptedPassword,
+	}
+	err = database.Model(account.Authentication).Updates(updates).Error
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

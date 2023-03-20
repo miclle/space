@@ -137,6 +137,13 @@ func TestAuthenticateAccount(t *testing.T) {
 	assert := assert.New(t)
 
 	account, err := accounter.AuthenticateAccount(context.Background(), &params.AuthenticateAccount{
+		ClientIP: "",
+	})
+	assert.NotNil(err)
+	assert.Equal(errors.New(http.StatusText(http.StatusUnauthorized)), err)
+	assert.Nil(account)
+
+	account, err = accounter.AuthenticateAccount(context.Background(), &params.AuthenticateAccount{
 		Login:    "lili",
 		Password: "lili_Password",
 		ClientIP: "",
@@ -156,6 +163,14 @@ func TestAuthenticateAccount(t *testing.T) {
 
 	account, err = accounter.AuthenticateAccount(context.Background(), &params.AuthenticateAccount{
 		Login:    "lisa",
+		Password: "lisa_Password",
+		ClientIP: "",
+	})
+	assert.Nil(err)
+	assert.NotNil(account)
+
+	account, err = accounter.AuthenticateAccount(context.Background(), &params.AuthenticateAccount{
+		Email:    "lisa@domain.local",
 		Password: "lisa_Password",
 		ClientIP: "",
 	})
@@ -224,10 +239,26 @@ func TestUpdatePassword(t *testing.T) {
 	assert.Nil(err)
 }
 
-func TestCreateResetPasswordToken(t *testing.T) {
-	// TODO(m)
-}
-
 func TestResetPassword(t *testing.T) {
-	// TODO(m)
+	assert := assert.New(t)
+
+	token, err := accounter.CreateResetPasswordToken(context.Background(), &params.CreateResetPasswordToken{
+		Email: "lisa@domain.local",
+	})
+	assert.Nil(err)
+	assert.NotEmpty(token)
+
+	err = accounter.ResetPassword(context.Background(), &params.ResetPassword{
+		Token:    token,
+		Password: "lisa_Password",
+	})
+
+	assert.Nil(err)
+
+	account, err := accounter.AuthenticateAccount(context.Background(), &params.AuthenticateAccount{
+		Login:    "lisa",
+		Password: "lisa_Password",
+	})
+	assert.Nil(err)
+	assert.NotNil(account)
 }
