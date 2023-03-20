@@ -1,0 +1,24 @@
+addr: :9000
+secret: OxGUCgtwS^dJatFmqxKw874faHM7IJgT
+env: debug # debug | release | test
+logger:
+  log_level: 1
+  console_logging_enabled: true
+  encode_logs_as_json: false
+  file_logging_enabled: false
+  filename: space.log
+  max_size: 100       # default 100MB
+  max_backups: 30
+  max_age: 30
+database:
+  dialect: mysql # mysql | postgres | sqlite | sqlserver | clickhouse
+  host: localhost
+  port: 3306
+  username: root
+  password:
+  database: space
+  encoding: utf8
+  max_idle_conns:
+  max_open_conns:
+  conn_max_life_time: # Second
+  conn_max_idle_time: # Second
