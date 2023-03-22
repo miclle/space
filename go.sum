@@ -94,6 +94,8 @@ github.com/envoyproxy/go-control-plane v0.9.9-0.20201210154907-fd9021fe5dad/go.m
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/fox-gonic/fox v0.0.0-20230228032629-f2daabd34f96 h1:Csxr5Mvao5KFLoitGbj6XlFvsovwjPjgMO1rqKdYCRE=
 github.com/fox-gonic/fox v0.0.0-20230228032629-f2daabd34f96/go.mod h1:rorCGg1OVTK/9YiKj8uSVkgdWw2bMqiaDhQ7/BRjBgQ=
+github.com/fox-gonic/fox v0.0.0-20230322064547-c6151780eff3 h1:IYDU13MuC8MR4JXFG6GtBgZrXEG/JHMzYk9zHZMAiQg=
+github.com/fox-gonic/fox v0.0.0-20230322064547-c6151780eff3/go.mod h1:c+xFS8UNOcYJv/ISoE4632XaV8ccAKDcOMFGJqsRAXI=
 github.com/frankban/quicktest v1.14.3 h1:FJKSZTDHjyhriyC81FLQ0LY93eSai0ZyR/ZIkd3ZUKE=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=

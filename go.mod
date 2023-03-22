@@ -3,7 +3,7 @@ module github.com/miclle/space
 go 1.20
 
 require (
-	github.com/fox-gonic/fox v0.0.0-20230228032629-f2daabd34f96
+	github.com/fox-gonic/fox v0.0.0-20230322064547-c6151780eff3
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/longbridgeapp/autocorrect v1.1.1
