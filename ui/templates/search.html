@@ -1,0 +1,56 @@
+{{- $lang := .Lang -}}
+{{- $q := .Q -}}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  {{ template "head" . }}
+</head>
+
+<body>
+  {{template "header" .}}
+
+  <main id="main">
+    <div class="container">
+      {{ with .Q -}}
+      <h1>Search results for: {{.}}</h1>
+      {{- else -}}
+      <h1>No query, no results.</h1>
+      {{- end }}
+
+      {{- with .Pagination }}
+      <div class="search-results">
+        <p>Found {{.Total}} matches.</p>
+
+        {{- if gt .Total 0 }}
+        <ul class="search-results-list">
+          {{- range $page := .Items }}
+          <li>
+            <h3><a href="/{{$page.Lang}}/docs/{{$page.Space.Key}}/{{$page.PageID}}">{{$page.Title}}</a></h3>
+            <p>{{abbrev 256 $page.Text}}</p>
+          </li>
+          {{- end }}
+        </ul>
+        {{- end }}
+      </div>
+
+      {{- if gt .TotalPages 1 }}
+      <nav aria-label="pagination" class="search-results-pagination">
+        {{- if gt .Page 1 }}
+        <a href="/{{$lang}}/search?q={{$q}}&amp;page={{sub .Page 1}}">Previous</a>
+        {{- end }}
+
+        {{- if lt .Page .TotalPages }}
+        <a href="/{{$lang}}/search?q={{$q}}&amp;page={{add .Page 1}}">Next</a>
+        {{- end }}
+      </nav>
+      {{- end }}
+      {{- end }}
+    </div>
+  </main>
+
+  {{template "footer" .}}
+</body>
+
+</html>

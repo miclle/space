@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  {{ template "head" . }}
+</head>
+
+<body>
+  {{ template "header" . }}
+
+  <main id="main">
+    <div class="d-flex flex-column justify-content-center align-items-center page-wrap container">
+      <div class="text-center mb-4">Oops, internal server error.</div>
+      <div class="text-center">
+        <a role="button" tabindex="0" href="/" class="btn btn-link">Back to homepage</a>
+      </div>
+    </div>
+  </main>
+
+  {{ template "footer" . }}
+</body>
+
+</html>

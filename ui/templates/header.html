@@ -1,0 +1,37 @@
+{{- define "header" -}}
+<nav class="navbar navbar-expand-lg" role="navigation" aria-label="Navigation">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Space</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Services</a>
+          {{- with .Spaces }}
+          <ul class="dropdown-menu">
+            {{- range $space := . }}
+            <li>
+              <a class="dropdown-item" href="/{{.Lang}}/docs/{{$space.Key}}">
+                {{- with $space.Homepage -}}
+                {{- $space.Homepage.ShortTitle -}}
+                {{- else -}}
+                {{- $space.Name -}}
+                {{- end -}}
+              </a>
+            </li>
+            {{- end }}
+          </ul>
+          {{- end }}
+        </li>
+      </ul>
+      <form class="search-form d-flex" role="search" action="/{{.Lang}}/search">
+        <input name="q" class="form-control search-input" type="search" placeholder="Search Docs" aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+{{- end -}}

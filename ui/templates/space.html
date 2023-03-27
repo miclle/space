@@ -1,0 +1,55 @@
+{{- $lang := .Lang -}}
+{{- $space := .Space -}}
+{{- $PageTree := .PageTree -}}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  {{ template "head" . }}
+</head>
+
+<body class="has-sidebar">
+  {{ template "header" . }}
+
+  <aside id="sidebar">
+    <div class="brand">
+      <a href="/{{$lang}}/docs/{{$space.Key}}">{{ $space.ShortTitle }}</a>
+    </div>
+
+    <!-- render pages tree nav -->
+    {{- template "pagetree" $PageTree }}
+  </aside>
+
+  <main id="main">
+    <div class="container-lg main-content">
+
+      <div class="breadcrumbs-feedback-wrapper">
+        <nav class="breadcrumb-wrapper" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="/">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $space.ShortTitle }}</li>
+          </ol>
+        </nav>
+      </div>
+
+      <div class="page">
+        <h1 class="page-title">{{$space.Homepage.Title}}</h1>
+        <div class="page-meta">
+          <span>Validated on {{$space.Homepage.UpdatedTime | date "02 Jan 2006"}} • Posted on {{$space.Homepage.CreatedTime | date "02 Jan 2006"}}</span>
+        </div>
+        <div class="page-body">
+          {{ $space.Homepage.HTML | unescapeHTML }}
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  {{ template "footer" . }}
+</body>
+
+</html>

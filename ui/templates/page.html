@@ -1,0 +1,63 @@
+{{- $lang := .Lang -}}
+{{- $space := .Space -}}
+{{- $PageTree := .PageTree -}}
+{{- $page := .Page -}}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  {{ template "head" . }}
+</head>
+
+<body class="has-sidebar">
+  {{ template "header" . }}
+
+  <aside id="sidebar">
+    <div class="brand">
+      <a href="/{{$lang}}/docs/{{$space.Key}}">{{ $space.ShortTitle }}</a>
+    </div>
+
+    <!-- render pages tree nav -->
+    {{- template "pagetree" $PageTree }}
+  </aside>
+
+  <main id="main">
+    <div class="container-lg main-content">
+
+      <div class="breadcrumbs-feedback-wrapper">
+        <nav class="breadcrumb-wrapper" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="/">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a href="/{{$lang}}/docs/{{$space.Key}}">{{ $space.ShortTitle }}</a>
+            </li>
+            {{- range $parent := $page.Parents }}
+            <li class="breadcrumb-item">
+              <a href="/{{$parent.Lang}}/docs/{{$space.Key}}/{{$parent.PageID}}" title="{{$parent.Title}}">{{$parent.ShortTitle}}</a>
+            </li>
+            {{- end }}
+            <li class="breadcrumb-item active" aria-current="page">{{$page.ShortTitle}}</li>
+          </ol>
+        </nav>
+      </div>
+
+      <div class="page">
+        <h1 class="page-title">{{$page.Title}}</h1>
+        <div class="page-meta">
+          <span>Validated on {{$page.UpdatedTime | date "02 Jan 2006"}} • Posted on {{$page.CreatedTime | date "02 Jan 2006"}}</span>
+        </div>
+        <div class="page-body">
+          {{ $page.HTML | unescapeHTML }}
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  {{ template "footer" . }}
+</body>
+
+</html>

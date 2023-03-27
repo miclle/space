@@ -1,0 +1,15 @@
+{{- define "head" -}}
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#375EAB">
+  {{ with .Title -}}
+  <title>{{html .}} - Space</title>
+  {{- else -}}
+  <title>Space</title>
+  {{- end }}
+  <link type="text/css" rel="stylesheet" href="/static/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="/static/style.css">
+  <script src="/static/bootstrap.bundle.min.js"></script>
+  <script src="/static/jquery-3.6.3.min.js"></script>
+  <script src="/static/application.js"></script>
+{{- end -}}
