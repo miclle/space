@@ -304,7 +304,7 @@ func (s *service) Unlock(ctx context.Context, params *params.Unlock) (err error)
 	}
 
 	var (
-		seg         = jwt.EncodeSegment(jsonValue)
+		seg         = base64.RawURLEncoding.EncodeToString(jsonValue)
 		tokenString = fmt.Sprintf("%s.%s", seg, string(tokenBytes))
 	)
 
@@ -446,7 +446,7 @@ func (s *service) ResetPassword(ctx context.Context, params *params.ResetPasswor
 	}
 
 	var (
-		seg         = jwt.EncodeSegment(jsonValue)
+		seg         = base64.RawURLEncoding.EncodeToString(jsonValue)
 		tokenString = fmt.Sprintf("%s.%s", seg, string(tokenBytes))
 	)
 
