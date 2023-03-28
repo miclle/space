@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/sprig/v3"
+
+	"github.com/miclle/space/models"
 )
 
 //go:embed build/* templates/*.html
@@ -19,8 +21,12 @@ var Template *template.Template
 
 // PageData template obj
 type PageData struct {
-	Lang  string
-	Title string
+	Lang   string
+	Title  string
+	Spaces []*models.Space
+	Space  *models.Space
+	// PageTree models.PageTree
+	Page *models.Page
 }
 
 func init() {
