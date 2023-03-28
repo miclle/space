@@ -126,6 +126,10 @@ func router(
 
 	router := engine.New()
 	router.SetHTMLTemplate(ui.Template)
+
+	// handle the static file by default ui static files
+	router.StaticFS("/static", ui.StaticFS())
+
 	router.Use(sessions.Sessions("SPACE", store))
 
 	// Embed website assets
