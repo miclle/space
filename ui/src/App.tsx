@@ -32,7 +32,7 @@ const App = observer(() => {
 
   return (
     <GlobalContext.Provider value={store}>
-      <ConfigProvider locale={zhCN} prefixCls="app" theme={{ hashed: false }}>
+      <ConfigProvider locale={zhCN} prefixCls="app">
         <IconContext.Provider value={{ className: 'app-icon' }}>
           <BrowserRouter>
             <QueryParamProvider

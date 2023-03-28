@@ -92,12 +92,19 @@ func reverseProxyWebsiteApp(router *engine.Engine, website string) {
 
 	proxy := &httputil.ReverseProxy{Director: director}
 
-	// router.GET("/static/*filepath", func(c *engine.Context) (res interface{}) {
-	// 	proxy.ServeHTTP(c.Writer, c.Request)
-	// 	return
-	// })
+	router.GET("/spaces", func(c *engine.Context) (res interface{}) {
+		proxy.ServeHTTP(c.Writer, c.Request)
+		return
+	})
+
+	router.GET("/spaces/*filepath", func(c *engine.Context) (res interface{}) {
+		c.Logger.Debug("/spaces/*filepath", c.Request.URL)
+		proxy.ServeHTTP(c.Writer, c.Request)
+		return
+	})
 
 	router.NotFound(func(c *engine.Context) {
+		c.Logger.Debug("NotFound", c.Request.URL)
 		proxy.ServeHTTP(c.Writer, c.Request)
 	})
 }
@@ -127,15 +134,13 @@ func router(
 	router := engine.New()
 	router.SetHTMLTemplate(ui.Template)
 
-	// handle the static file by default ui static files
-	router.StaticFS("/static", ui.StaticFS())
-
 	router.Use(sessions.Sessions("SPACE", store))
 
 	// Embed website assets
 	// !IMPORTANT:
 	if engine.Mode() == engine.DebugMode {
 		reverseProxyWebsiteApp(router, os.Getenv("PROXY_WEBSITE"))
+		router.StaticFS("/static", ui.StaticFS("public/static/"))
 	} else {
 		embedPublicAssets(router)
 	}
