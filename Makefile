@@ -52,7 +52,7 @@ serve:
 		-R 'Makefile' \
 		-R '.log$$' \
 		-R '_test.go$$'\
-		-- go run -trimpath cmd/space/*.go -f cmd/space/config.local.yaml | tee -a development.log
+		-- go run -tags=jsoniter -trimpath cmd/space/*.go -f cmd/space/config.local.yaml | tee -a development.log
 
 # Build website and backend to a single app
 # 1. build website
