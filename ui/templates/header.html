@@ -27,10 +27,15 @@
           {{- end }}
         </li>
       </ul>
+
       <form class="search-form d-flex" role="search" action="/{{.Lang}}/search">
         <input name="q" class="form-control search-input" type="search" placeholder="Search Docs" aria-label="Search">
-        <button class="btn btn-outline-primary" type="submit">Search</button>
       </form>
+
+      <div class="d-lg-flex justify-content-end">
+        <a class="btn btn-link ms-2" href="/signin">Sign in</a>
+        <a class="btn btn-primary ms-2" href="/signup">Sign up</a>
+      </div>
     </div>
   </div>
 </nav>

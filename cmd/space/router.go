@@ -23,6 +23,13 @@ import (
 	"github.com/miclle/space/ui"
 )
 
+var spaRoutes = []string{
+	"/signin",
+	"/signup",
+	"/spaces",
+	"/spaces/*filepath",
+}
+
 // embedPublicAssets embed fs from `public` dir
 func embedPublicAssets(router *engine.Engine) {
 
@@ -92,16 +99,13 @@ func reverseProxyWebsiteApp(router *engine.Engine, website string) {
 
 	proxy := &httputil.ReverseProxy{Director: director}
 
-	router.GET("/spaces", func(c *engine.Context) (res interface{}) {
-		proxy.ServeHTTP(c.Writer, c.Request)
-		return
-	})
-
-	router.GET("/spaces/*filepath", func(c *engine.Context) (res interface{}) {
-		c.Logger.Debug("/spaces/*filepath", c.Request.URL)
-		proxy.ServeHTTP(c.Writer, c.Request)
-		return
-	})
+	for _, path := range spaRoutes {
+		router.GET(path, func(c *engine.Context) (res interface{}) {
+			c.Logger.Debug("/spaces/*filepath", c.Request.URL)
+			proxy.ServeHTTP(c.Writer, c.Request)
+			return
+		})
+	}
 
 	router.NotFound(func(c *engine.Context) {
 		c.Logger.Debug("NotFound", c.Request.URL)

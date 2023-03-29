@@ -13,6 +13,9 @@ import { WaitingComponent } from 'components/WaitingComponent';
 import { GlobalContext, GlobalStore } from 'global/Store';
 import ApplicationLayout from 'pages/ApplicationLayout';
 
+const Signup = WaitingComponent(React.lazy(() => import(/* webpackChunkName: "signup" */ 'pages/Signup')));
+const Signin = WaitingComponent(React.lazy(() => import(/* webpackChunkName: "signin" */ 'pages/Signin')));
+
 const Spaces = WaitingComponent(React.lazy(() => import(/* webpackChunkName: "spaces" */ 'pages/Spaces')));
 const NewSpace = WaitingComponent(React.lazy(() => import(/* webpackChunkName: "spaces" */ 'pages/Spaces/New')));
 const Space = WaitingComponent(React.lazy(() => import(/* webpackChunkName: "spaces" */ 'pages/Spaces/Detail')));
@@ -43,6 +46,9 @@ const App = observer(() => {
               }}
             >
               <Routes>
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/signin" element={<Signin />} />
+
                 <Route path="" element={<ApplicationLayout />}>
                   {/* <Route index element={<Dashboard />} /> */}
 
