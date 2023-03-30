@@ -49,10 +49,10 @@ const App = observer(() => {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/signin" element={<Signin />} />
 
-                <Route path="" element={<ApplicationLayout />}>
+                <Route element={<ApplicationLayout />}>
                   {/* <Route index element={<Dashboard />} /> */}
 
-                  <Route index element={<Spaces />} />
+                  {/* <Route index element={<Spaces />} /> */}
                   <Route path="spaces" element={<Spaces />} />
                   <Route path="spaces/new" element={<NewSpace />} />
 

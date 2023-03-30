@@ -28,6 +28,8 @@ var spaRoutes = []string{
 	"/signup",
 	"/spaces",
 	"/spaces/*filepath",
+	"/accounts",
+	"/accounts/*filepath",
 }
 
 // embedPublicAssets embed fs from `public` dir
