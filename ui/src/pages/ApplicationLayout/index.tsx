@@ -67,9 +67,9 @@ const Admin = observer(() => {
         }}
       >
         <Row>
-          <Col flex="200px">
-            <Link to="/" className="logo" style={{ display: 'inline-block' }}>
-              <svg width="180" height="32" viewBox="0 0 180 22" fill="none">
+          <Col flex="100px">
+            <Link to="/spaces" className="logo" style={{ display: 'inline-block' }}>
+              <svg width="80" height="32" viewBox="0 0 80 22" fill="none">
                 <text fill="#FFF" style={{ fontWeight: 'bold' }} x="5" y="18" fontFamily="Verdana" fontSize="20">Space</text>
               </svg>
             </Link>
