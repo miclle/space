@@ -20,6 +20,7 @@ type CreateAccount struct {
 	Name     string
 	Bio      string
 	Location string
+	Status   models.UserStatus
 }
 
 // DescribeAccounts describe accounts params

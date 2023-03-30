@@ -8,14 +8,34 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserStatus user status
+type UserStatus string
+
+// UserStatus enum
+const (
+	UserPendingStatus   UserStatus = "pending"
+	UserActivatedStatus UserStatus = "activated"
+	UserDisabledStatus  UserStatus = "disabled"
+)
+
+// IsValid 是否有效
+func (status UserStatus) IsValid() bool {
+	switch status {
+	case UserPendingStatus, UserActivatedStatus, UserDisabledStatus:
+		return true
+	}
+	return false
+}
+
 // Account model
 type Account struct {
 	database.Model
-	Login    string `json:"login"    gorm:"uniqueIndex;size:255"`
-	Email    string `json:"email"    gorm:"uniqueIndex;size:255"`
-	Name     string `json:"name"     gorm:"size:255"`
-	Bio      string `json:"bio"      gorm:"size:255"`
-	Location string `json:"location" gorm:"size:255"`
+	Login    string     `json:"login"    gorm:"uniqueIndex;size:255"`
+	Email    string     `json:"email"    gorm:"uniqueIndex;size:255"`
+	Name     string     `json:"name"     gorm:"size:255"`
+	Bio      string     `json:"bio"      gorm:"size:255"`
+	Location string     `json:"location" gorm:"size:255"`
+	Status   UserStatus `json:"status"   gorm:"size:32"`
 
 	Authentication *Authentication `json:"-"`
 }

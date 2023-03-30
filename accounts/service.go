@@ -89,6 +89,7 @@ func (s *service) CreateAccount(ctx context.Context, params *params.CreateAccoun
 			Email:    params.Email,
 			Bio:      params.Bio,
 			Location: params.Location,
+			Status:   params.Status,
 		}
 		if err := tx.Create(account).Error; err != nil {
 			return err
