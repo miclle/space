@@ -11,8 +11,8 @@ import (
 	"github.com/miclle/space/accounts/params"
 )
 
-// SessionStaffLoginKey session account context key
-const SessionStaffLoginKey = "staff-login"
+// SessionAccountKey session account context key
+const SessionAccountKey = "session-login-key"
 
 var skipPaths = []string{
 	"/static",
@@ -43,7 +43,7 @@ func (actions *Actions) AuthMiddleware(c *engine.Context) (res interface{}) {
 
 	var (
 		session = sessions.Default(c.Context)
-		login   = session.Get(SessionStaffLoginKey)
+		login   = session.Get(SessionAccountKey)
 	)
 
 	if login != nil {

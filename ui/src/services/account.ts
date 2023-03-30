@@ -12,7 +12,7 @@ export function overview(): Promise<IAccount> {
  * @returns
  */
 export function signup(args: Partial<IAccount>): Promise<IAccount> {
-  return POST<IAccount>('/signup', args);
+  return POST<IAccount>('/accounts/signup', args);
 }
 
 /**
@@ -22,5 +22,5 @@ export function signup(args: Partial<IAccount>): Promise<IAccount> {
  * @returns
  */
 export function signin(login: string, password: string): Promise<IAccount> {
-  return POST<IAccount>('/signin', { login, password });
+  return POST<IAccount>('/accounts/signin', { login, password });
 }

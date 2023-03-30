@@ -193,10 +193,14 @@ func router(
 		// auth middleware
 		// router.Use(api.AuthMiddleware)
 
-		// router.GET("/logout", actions.Logout)         // 登出
-		// router.GET("/api/overview", actions.Overview) // 用户信息概览
+		router.GET("/logout", api.Logout)
+		// router.GET("/api/overview", actions.Overview)
 
 		group := router.Group("/api")
+
+		group.POST("/accounts/signup", api.Signup)
+		group.POST("/accounts/signin", api.Signin)
+
 		group.POST("/spaces", api.CreateSpace)
 		group.GET("/spaces", api.DescribeSpaces)
 
