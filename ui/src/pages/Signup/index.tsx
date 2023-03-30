@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useNavigate } from "react-router-dom";
-import { Alert, Button, Checkbox, Form, Input, Layout, notification, Typography } from "antd";
+import { Alert, Button, Checkbox, Form, Input, Layout, Typography } from "antd";
 import { AiOutlineLock, AiOutlineMail, AiOutlineUser } from 'react-icons/ai';
 import { Account } from 'services';
 import { AxiosResponse } from "axios";
@@ -11,14 +10,12 @@ import { IAccount } from "models";
 
 const Signup = observer(() => {
 
-  const navigate = useNavigate();
   const [alert, setAlert] = useState('');
 
   const onFinish = (values: Partial<IAccount>) => {
     Account.signup(values)
       .then(() => {
-        notification.success({ message: '注册成功' });
-        navigate('/');
+        window.location.href = '/'
       })
       .catch((resp: AxiosResponse<IErrorMessage>) => {
         setAlert(map(resp.data.message, (value, key) => value).join('\n'))
