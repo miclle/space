@@ -1,6 +1,8 @@
 package models
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -38,11 +40,25 @@ type Account struct {
 	Status   UserStatus `json:"status"   gorm:"size:32"`
 
 	Authentication *Authentication `json:"-"`
+	Avatar         string          `json:"avatar" gorm:"-"`
 }
 
 // TableName user model table name
 func (Account) TableName() string {
 	return "accounts"
+}
+
+// AfterFind gorm after find callback
+func (account *Account) AfterFind(tx *gorm.DB) (err error) {
+
+	// TODO(m) using system configuration
+	if len(account.Email) > 0 {
+		h := md5.New()
+		h.Write([]byte(account.Email))
+		account.Avatar = fmt.Sprintf("https://www.gravatar.com/avatar/%s", hex.EncodeToString(h.Sum(nil)))
+	}
+
+	return
 }
 
 // BeforeDelete gorm before delete callback

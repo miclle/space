@@ -3,7 +3,7 @@ import { GET, POST } from "./lib/http";
 import { IAccount } from "models";
 
 export function overview(): Promise<IAccount> {
-  return GET<IAccount>('/overview');
+  return GET<IAccount>('/accounts/overview');
 }
 
 /**
