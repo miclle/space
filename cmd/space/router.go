@@ -192,14 +192,11 @@ func router(
 			Spacer:        spacer,
 		}
 
-		// auth middleware
-		// router.Use(api.AuthMiddleware)
-
 		router.GET("/logout", api.Logout)
-		// router.GET("/api/overview", actions.Overview)
 
-		group := router.Group("/api")
+		group := router.Group("/api", api.AuthMiddleware)
 
+		group.GET("/accounts/overview", api.Overview)
 		group.POST("/accounts/signup", api.Signup)
 		group.POST("/accounts/signin", api.Signin)
 

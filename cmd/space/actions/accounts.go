@@ -97,3 +97,11 @@ func (actions *Actions) Logout(c *engine.Context) (res interface{}) {
 		Location: "/",
 	}
 }
+
+// Overview user overview
+func (actions *Actions) Overview(c *engine.Context) (*models.Account, error) {
+
+	account := c.MustGet("account").(*models.Account)
+
+	return account, nil
+}
