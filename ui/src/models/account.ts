@@ -8,4 +8,5 @@ export interface IAccount {
   name:   string
   email:  string
   status: string
+  avatar: string
 }

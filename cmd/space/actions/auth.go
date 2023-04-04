@@ -6,6 +6,7 @@ import (
 	"github.com/fox-gonic/fox/engine"
 	"github.com/fox-gonic/fox/errors"
 	"github.com/gin-contrib/sessions"
+	"github.com/gin-gonic/gin/render"
 	"github.com/samber/lo"
 
 	"github.com/miclle/space/accounts/params"
@@ -61,6 +62,7 @@ func (actions *Actions) AuthMiddleware(c *engine.Context) (res interface{}) {
 				}
 			} else {
 				c.Set("account", account)
+				return
 			}
 		}
 	}
@@ -69,10 +71,8 @@ func (actions *Actions) AuthMiddleware(c *engine.Context) (res interface{}) {
 		return errors.ErrUnauthorized
 	}
 
-	// return render.Redirect{
-	// 	Code:     302,
-	// 	Location: "/signin",
-	// }
-
-	return
+	return render.Redirect{
+		Code:     302,
+		Location: "/signin",
+	}
 }

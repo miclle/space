@@ -42,7 +42,7 @@ const Admin = observer(() => {
 
   useEffect(() => {
     const items: ItemType[] = [
-      { key: 'current_user', label: <Link to='/'>Signed in as <strong>{account.name || account.login}</strong></Link> },
+      { key: 'current_user', label: <Link to='/spaces'>Signed in as <strong>{account.name || account.login}</strong></Link> },
       { type: 'divider' },
       { key: 'sign_out', label: <a href="/logout">Sign out</a> },
     ]
@@ -67,9 +67,9 @@ const Admin = observer(() => {
         }}
       >
         <Row>
-          <Col flex="200px">
-            <Link to="/" className="logo" style={{ display: 'inline-block' }}>
-              <svg width="180" height="32" viewBox="0 0 180 22" fill="none">
+          <Col flex="100px">
+            <Link to="/spaces" className="logo" style={{ display: 'inline-block' }}>
+              <svg width="80" height="32" viewBox="0 0 80 22" fill="none">
                 <text fill="#FFF" style={{ fontWeight: 'bold' }} x="5" y="18" fontFamily="Verdana" fontSize="20">Space</text>
               </svg>
             </Link>
@@ -93,7 +93,12 @@ const Admin = observer(() => {
               menu={{ items: accountDropdownMenuItems }}
             >
               <Button type="link" style={{ paddingRight: 0 }}>
-                <Avatar size={20} icon={<AiOutlineUser />} style={{ backgroundColor: '#87d068' }} />
+                <Avatar
+                  size={20}
+                  icon={<AiOutlineUser />}
+                  src={account.avatar}
+                  style={{ backgroundColor: '#87d068' }}
+                />
                 <AiOutlineCaretDown style={{ margin: 0 }} />
               </Button>
             </Dropdown>

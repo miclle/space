@@ -29,6 +29,7 @@ func (actions *Actions) Signup(c *engine.Context, args *SignupArgs) (*models.Acc
 		Name:     args.Name,
 		Bio:      args.Bio,
 		Location: args.Location,
+		Status:   models.UserPendingStatus,
 	})
 	if err != nil {
 		return nil, err
@@ -46,7 +47,7 @@ func (actions *Actions) Signup(c *engine.Context, args *SignupArgs) (*models.Acc
 	return account, nil
 }
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // SigninArgs user sign in args
 type SigninArgs struct {
@@ -95,4 +96,12 @@ func (actions *Actions) Logout(c *engine.Context) (res interface{}) {
 		Code:     302,
 		Location: "/",
 	}
+}
+
+// Overview user overview
+func (actions *Actions) Overview(c *engine.Context) (*models.Account, error) {
+
+	account := c.MustGet("account").(*models.Account)
+
+	return account, nil
 }
