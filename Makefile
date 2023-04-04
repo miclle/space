@@ -20,7 +20,7 @@ golint:
 
 test:
 	go clean -i -testcache
-	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+	CGO_ENABLED=0; go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
 coverage: test
 	go tool cover -html=coverage.txt -o coverage.html
