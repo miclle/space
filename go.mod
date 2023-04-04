@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/fox-gonic/fox v0.0.0-20230322064547-c6151780eff3
+	github.com/fox-gonic/fox v0.0.0-20230323071353-71b8de0a8380
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.11.2
