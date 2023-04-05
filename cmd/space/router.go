@@ -23,27 +23,6 @@ import (
 	"github.com/miclle/space/ui"
 )
 
-var staticAssets = []string{
-	"/android-chrome-192x192.png",
-	"/android-chrome-512x512.png",
-	"/apple-touch-icon.png",
-	"/favicon-16x16.png",
-	"/favicon-32x32.png",
-	"/favicon.ico",
-	"/index.html",
-	"/manifest.json",
-	"/robots.txt",
-}
-
-var spaRoutes = []string{
-	"/signin",
-	"/signup",
-	"/spaces",
-	"/spaces/*filepath",
-	"/accounts",
-	"/accounts/*filepath",
-}
-
 // embedPublicAssets embed fs from `public` dir
 func embedPublicAssets(router *engine.Engine) {
 
@@ -102,11 +81,6 @@ func embedPublicAssets(router *engine.Engine) {
 // reverseProxyWebsiteApp proxy development website
 func reverseProxyWebsiteApp(router *engine.Engine, website string) {
 
-	router.StaticFS("/static", ui.StaticFS("public/static/"))
-	for _, path := range staticAssets {
-		router.StaticFS(path, ui.StaticFS("public/"))
-	}
-
 	origin, _ := url.Parse(website)
 
 	director := func(req *http.Request) {
@@ -118,7 +92,14 @@ func reverseProxyWebsiteApp(router *engine.Engine, website string) {
 
 	proxy := &httputil.ReverseProxy{Director: director}
 
-	for _, path := range spaRoutes {
+	for _, path := range ui.StaticAssets {
+		router.GET(path, func(c *engine.Context) (res interface{}) {
+			proxy.ServeHTTP(c.Writer, c.Request)
+			return
+		})
+	}
+
+	for _, path := range ui.SPARoutes {
 		router.GET(path, func(c *engine.Context) (res interface{}) {
 			c.Logger.Debug("/spaces/*filepath", c.Request.URL)
 			proxy.ServeHTTP(c.Writer, c.Request)

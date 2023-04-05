@@ -16,6 +16,32 @@ import (
 //go:embed public/* build/* templates/*.html
 var embedFS embed.FS
 
+// StaticAssets static assets
+var StaticAssets = []string{
+	"/android-chrome-192x192.png",
+	"/android-chrome-512x512.png",
+	"/apple-touch-icon.png",
+	"/favicon-16x16.png",
+	"/favicon-32x32.png",
+	"/favicon.ico",
+	"/index.html",
+	"/manifest.json",
+	"/robots.txt",
+
+	"/static",
+	"/static/*filepath",
+}
+
+// SPARoutes front SPA app routes
+var SPARoutes = []string{
+	"/signin",
+	"/signup",
+	"/spaces",
+	"/spaces/*filepath",
+	"/accounts",
+	"/accounts/*filepath",
+}
+
 // Template for all
 var Template *template.Template
 
