@@ -190,12 +190,12 @@ func router(
 		}
 
 		router.GET("/logout", api.Logout)
+		router.POST("/api/accounts/signup", api.Signup)
+		router.POST("/api/accounts/signin", api.Signin)
 
 		group := router.Group("/api", api.AuthMiddleware)
 
 		group.GET("/accounts/overview", api.Overview)
-		group.POST("/accounts/signup", api.Signup)
-		group.POST("/accounts/signin", api.Signin)
 
 		group.POST("/spaces", api.CreateSpace)
 		group.GET("/spaces", api.DescribeSpaces)
