@@ -13,7 +13,7 @@ import (
 	"github.com/miclle/space/models"
 )
 
-//go:embed public/* build/* templates/*.html
+//go:embed build/* templates/*.html
 var embedFS embed.FS
 
 // StaticAssets static assets
