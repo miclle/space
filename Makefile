@@ -40,7 +40,7 @@ site:
 
 # Run back-end service and proxy website requests
 serve:
-	PROXY_WEBSITE=http://localhost:3000 reflex\
+	reflex\
 		-d none -s\
 		-R 'tmp/' \
 		-R '\.github' \
