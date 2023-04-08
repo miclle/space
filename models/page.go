@@ -48,6 +48,11 @@ type PageMeta struct {
 	Space   *Space `json:"space,omitempty"`
 }
 
+// TableName user model table name
+func (PageMeta) TableName() string {
+	return "space_page_meta"
+}
+
 // Page page version model
 type Page struct {
 	ID int64 `json:"-" gorm:"primaryKey"`
