@@ -2,9 +2,9 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 
-	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 )
 
@@ -35,8 +35,8 @@ func (t PageStatus) IsValid() error {
 	}
 }
 
-// PageMeta page meta model
-type PageMeta struct {
+// Page page meta model
+type Page struct {
 	ID            int64         `json:"id"             nestedset:"id"             gorm:"primaryKey;autoIncrement"`
 	ParentID      sql.NullInt64 `json:"parent_id"      nestedset:"parent_id"      gorm:"index"`
 	Rgt           int           `json:"rgt"            nestedset:"rgt"`
@@ -46,24 +46,38 @@ type PageMeta struct {
 
 	SpaceID int64  `json:"-"               gorm:"index"`
 	Space   *Space `json:"space,omitempty"`
+
+	Content *PageContent `json:"content"`
 }
 
 // TableName user model table name
-func (PageMeta) TableName() string {
-	return "space_page_meta"
+func (Page) TableName() string {
+	return "space_pages"
 }
 
-// Page page version model
-type Page struct {
+// MarshalJSON implement
+func (page *Page) MarshalJSON() ([]byte, error) {
+	type Alias Page
+	return json.Marshal(&struct {
+		ParentID int64 `json:"parent_id"`
+		*Alias
+	}{
+		ParentID: page.ParentID.Int64,
+		Alias:    (*Alias)(page),
+	})
+}
+
+// PageContent page version model
+type PageContent struct {
 	ID int64 `json:"-" gorm:"primaryKey"`
 
-	SpaceID      int64 `json:"-" gorm:"index"`
-	CreatorID    int64 `json:"-" gorm:"index"`
-	ParentPageID int64 `json:"-" gorm:"index"`
+	SpaceID   int64 `json:"-" gorm:"index"`
+	CreatorID int64 `json:"-" gorm:"index"`
 
-	PageID     int64      `json:"id"          gorm:"uniqueIndex:page_content"`
-	Lang       string     `json:"lang"        gorm:"uniqueIndex:page_content;size:32"`
-	Version    string     `json:"version"     gorm:"uniqueIndex:page_content;size:64"`
+	PageID  int64  `json:"-"       gorm:"uniqueIndex:page_content"`
+	Lang    string `json:"lang"    gorm:"uniqueIndex:page_content;size:32"`
+	Version string `json:"version" gorm:"uniqueIndex:page_content;size:64"`
+
 	Status     PageStatus `json:"status"      gorm:"size:32"`
 	Title      string     `json:"title"       gorm:"size:255;index"`
 	ShortTitle string     `json:"short_title" gorm:"size:255;index"`
@@ -78,27 +92,6 @@ type Page struct {
 }
 
 // TableName user model table name
-func (Page) TableName() string {
-	return "space_pages"
-}
-
-// BeforeCreate gorm before create callback
-func (page *Page) BeforeCreate(tx *gorm.DB) (err error) {
-	if page.PageID > 0 {
-		var p *Page
-		err = tx.Where("`space_id` = ? AND `page_id` = ?", page.SpaceID, page.PageID).First(&p).Error
-		if err != nil {
-			return err
-		}
-		page.ParentPageID = p.ParentPageID
-	}
-	return
-}
-
-// AfterCreate gorm after create callback
-func (page *Page) AfterCreate(tx *gorm.DB) (err error) {
-	if page.PageID == 0 {
-		tx.Model(page).Update("page_id", page.ID)
-	}
-	return
+func (PageContent) TableName() string {
+	return "space_page_contents"
 }

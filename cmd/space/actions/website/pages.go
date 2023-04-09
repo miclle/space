@@ -58,13 +58,13 @@ func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) 
 	}
 
 	// redirect to space homepage
-	if page.PageID == space.Homepage.PageID {
+	if page.ID == space.Homepage.ID {
 		c.Redirect(http.StatusFound, fmt.Sprintf("/%s/docs/%s", args.Lang, space.Key))
 		return
 	}
 
-	data.Title = page.Title
-	data.Page = page
+	// data.Title = page.Title
+	// data.Page = page
 
 	c.HTML(200, "page.html", data)
 }

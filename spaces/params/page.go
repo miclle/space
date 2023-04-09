@@ -10,7 +10,6 @@ type CreatePage struct {
 	SpaceID         int64
 	CreatorID       int64
 	ParentID        int64
-	PageID          int64
 	Lang            string
 	Version         string
 	Status          models.PageStatus
@@ -52,7 +51,7 @@ type UpdatePage struct {
 
 // Search page params
 type Search struct {
-	database.Pagination[*models.Page]
+	database.Pagination[*models.PageContent]
 	Lang string
 	Q    string
 }

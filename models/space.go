@@ -47,7 +47,7 @@ type Space struct {
 	Status       SpaceStatus `json:"status"        gorm:"index;size:32"`
 	CreatorID    int64       `json:"-"`
 
-	Homepage *Page `json:"homepage,omitempty" gorm:"foreignKey:HomepageID;references:PageID"`
+	Homepage *Page `json:"homepage,omitempty" gorm:"foreignKey:HomepageID"`
 }
 
 // TableName user model table name

@@ -2,11 +2,13 @@ package spaces
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/fox-gonic/fox/database"
+	"github.com/fox-gonic/fox/database/nestedset"
 	"gorm.io/gorm"
 
 	"github.com/miclle/space/models"
@@ -26,7 +28,7 @@ type Service interface {
 	DescribePage(context.Context, *params.DescribePage) (*models.Page, error)
 	UpdatePage(context.Context, *params.UpdatePage) (*models.Page, error)
 
-	Serach(context.Context, *params.Search) (*database.Pagination[*models.Page], error)
+	Serach(context.Context, *params.Search) (*database.Pagination[*models.PageContent], error)
 }
 
 // NewService return default implement spaces service
@@ -76,22 +78,31 @@ func (s *service) CreateSpace(ctx context.Context, params *params.CreateSpace) (
 
 		page := &models.Page{
 			SpaceID: space.ID,
-			Lang:    params.Lang,
+		}
+
+		if err := nestedset.Create(tx, page, nil); err != nil {
+			return err
+		}
+
+		content := &models.PageContent{
+			SpaceID:   space.ID,
+			CreatorID: params.CreatorID,
+			PageID:    page.ID,
+			Lang:      space.Lang,
 			// Version:   space.Version, // TODO(m) space default version
 			Status:     models.PageStatusPublished,
 			Title:      space.Name,
 			ShortTitle: space.Name,
 			Body:       space.Description,
 			HTML:       space.Description,
-			CreatorID:  params.CreatorID,
 		}
 
-		err = tx.Create(page).Error
+		err = tx.Create(content).Error
 		if err != nil {
 			return err
 		}
 
-		err = tx.Model(space).Update("homepage_id", page.PageID).Error
+		err = tx.Model(space).Update("homepage_id", page.ID).Error
 		if err != nil {
 			return err
 		}
@@ -163,10 +174,16 @@ func (s *service) DescribeSpace(ctx context.Context, params *params.DescribeSpac
 	}
 
 	// find space homepage
-	err = database.Where("`space_id` = ? AND `page_id` = ? AND `lang` = ?", space.ID, space.HomepageID, lang).First(&space.Homepage).Error
+	err = database.Where("`space_id` = ? AND `id` = ?", space.ID, space.HomepageID).First(&space.Homepage).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// find space homepage content
+	err = database.Where("`page_id` = ? AND `lang` = ?", space.HomepageID, lang).First(&space.Homepage.Content).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) && lang != space.FallbackLang {
-			err = database.Where("`space_id` = ? AND `page_id` = ? AND `lang` = ?", space.ID, space.HomepageID, space.FallbackLang).First(&space.Homepage).Error
+			err = database.Where("`page_id` = ? AND `lang` = ?", space.HomepageID, space.FallbackLang).First(&space.Homepage.Content).Error
 		}
 		return nil, err
 	}
@@ -219,6 +236,7 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 		database = s.Database.WithContext(ctx)
 		space    *models.Space
 		page     *models.Page
+		content  *models.PageContent
 	)
 
 	if err := params.Status.IsValid(); err != nil {
@@ -238,34 +256,44 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 	err = database.Transaction(func(tx *gorm.DB) error {
 
 		page = &models.Page{
-			SpaceID:      params.SpaceID,
-			CreatorID:    params.CreatorID,
-			ParentPageID: params.ParentID,
-			PageID:       params.PageID,
-			Lang:         params.Lang,
-			Version:      params.Version,
-			Status:       params.Status,
-			Title:        params.Title,
-			ShortTitle:   params.ShortTitle,
-			Body:         params.Body,
-			HTML:         html,
+			SpaceID:  space.ID,
+			ParentID: sql.NullInt64{Valid: true, Int64: params.ParentID},
 		}
 
-		if len(page.ShortTitle) == 0 {
-			page.ShortTitle = page.Title
+		if err := tx.Create(page).Error; err != nil {
+			return err
 		}
 
-		if page.Lang == "" {
-			page.Lang = space.Lang
+		content = &models.PageContent{
+			SpaceID:    space.ID,
+			CreatorID:  params.CreatorID,
+			PageID:     page.ID,
+			Lang:       space.Lang,
+			Version:    params.Version,
+			Status:     params.Status,
+			Title:      params.Title,
+			ShortTitle: params.ShortTitle,
+			Body:       params.Body,
+			HTML:       html,
 		}
 
-		if err := tx.Create(&page).Error; err != nil {
+		if len(content.ShortTitle) == 0 {
+			content.ShortTitle = content.Title
+		}
+
+		if content.Lang == "" {
+			content.Lang = space.Lang
+		}
+
+		if err := tx.Create(&content).Error; err != nil {
 			return err
 		}
 
 		// TODO(m) add history version record
 		return nil
 	})
+
+	page.Content = content
 
 	return page, err
 }
@@ -287,13 +315,18 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 	if lang == "" {
 		lang = space.Lang
 	}
-	database = database.Where("`lang` = ?", lang)
 
-	if len(params.Version) > 0 {
-		database = database.Where("`version` = ?", params.Version)
-	}
+	// TODO(m)
+	// if len(params.Version) > 0 {
+	// 	database = database.Where("`version` = ?", params.Version)
+	// }
 
-	err = database.Omit("html").Where("`space_id` = ?", space.ID).Find(&pages).Error
+	err = database.
+		Joins("Content", database.Where(&models.PageContent{Lang: lang})).
+		Where("`space_pages`.`space_id` = ?", space.ID).
+		Order("`lft` ASC").
+		Find(&pages).
+		Error
 
 	return pages, err
 }
@@ -352,27 +385,27 @@ func (s *service) UpdatePage(ctx context.Context, params *params.UpdatePage) (*m
 	}
 
 	if params.Lang != nil {
-		page.Lang = *params.Lang
+		// page.Lang = *params.Lang
 	}
 	if params.Version != nil {
-		page.Version = *params.Version
+		// page.Version = *params.Version
 	}
 	if params.Status != nil {
-		page.Status = *params.Status
+		// page.Status = *params.Status
 	}
 	if params.Title != nil {
-		page.Title = *params.Title
+		// page.Title = *params.Title
 	}
 	if params.ShortTitle != nil {
-		page.ShortTitle = *params.ShortTitle
+		// page.ShortTitle = *params.ShortTitle
 	}
 	if params.Body != nil {
-		html, err := markdown.Parse(*params.Body)
-		if err != nil {
-			return nil, err
-		}
-		page.Body = *params.Body
-		page.HTML = html
+		// html, err := markdown.Parse(*params.Body)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// page.Body = *params.Body
+		// page.HTML = html
 	}
 
 	err = database.Save(page).Error
@@ -380,7 +413,7 @@ func (s *service) UpdatePage(ctx context.Context, params *params.UpdatePage) (*m
 	return page, err
 }
 
-func (s *service) Serach(ctx context.Context, params *params.Search) (*database.Pagination[*models.Page], error) {
+func (s *service) Serach(ctx context.Context, params *params.Search) (*database.Pagination[*models.PageContent], error) {
 
 	var (
 		database   = s.Database.WithContext(ctx)

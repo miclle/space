@@ -11,8 +11,8 @@ func Migrate(db *database.Database) error {
 		&Account{},
 		&Authentication{},
 		&Space{},
-		&PageMeta{},
 		&Page{},
+		&PageContent{},
 	)
 	if err != nil {
 		return err

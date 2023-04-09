@@ -34,7 +34,6 @@ func (actions *Actions) CreatePage(c *engine.Context, args *CreatePageArgs) (*mo
 			SpaceID:         space.ID,
 			CreatorID:       account.ID,
 			ParentID:        args.ParentID,
-			PageID:          args.PageID,
 			Lang:            args.Lang,
 			Version:         args.Version,
 			Status:          args.Status,
@@ -92,9 +91,9 @@ type DescribePageArgs struct {
 
 // DescribePage describe page detail
 // GET /api/spaces/:key/pages/:id
-func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) (*models.Page, error) {
+func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) (*models.PageContent, error) {
 
-	var page = c.MustGet("page").(*models.Page)
+	var page = c.MustGet("page").(*models.PageContent)
 
 	return page, nil
 }
@@ -117,7 +116,7 @@ type UpdatePageArgs struct {
 // PATCH /api/spaces/:key/pages/:id
 func (actions *Actions) UpdatePage(c *engine.Context, args *UpdatePageArgs) (*models.Page, error) {
 	var (
-		page   = c.MustGet("page").(*models.Page)
+		page   = c.MustGet("page").(*models.PageContent)
 		params = &params.UpdatePage{
 			ID:              page.ID,
 			Lang:            args.Lang,

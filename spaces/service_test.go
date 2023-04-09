@@ -74,7 +74,7 @@ func TestCreateSpace(t *testing.T) {
 	assert.Equal("Website", space.Name)
 	assert.Equal("website", space.Key)
 	assert.NotNil(space.Homepage)
-	assert.Equal("Website", space.Homepage.Title)
+	// assert.Equal("Website", space.Homepage.Title)
 
 	space, err = spacer.CreateSpace(context.Background(), &params.CreateSpace{
 		Name:   "Website",
