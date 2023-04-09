@@ -33,18 +33,18 @@ const Spaces = observer(() => {
 
   const columns = [
     {
-      title: '空间',
+      title: 'Space',
       dataIndex: 'name',
       key: 'name',
       render: (name: string, space: ISpace) => <Link to={`/spaces/${space.key}`}>{name}</Link>
     },
     {
-      title: '描述',
+      title: 'Description',
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: '状态',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
     },
@@ -63,7 +63,7 @@ const Spaces = observer(() => {
   return (
     <Layout.Content>
       <div className="container">
-        <PageHeader ghost={false} title="空间列表">
+        <PageHeader ghost={false} title="Spaces">
           <Row>
             <Col flex="auto">
               <Form layout="inline">
@@ -78,7 +78,7 @@ const Spaces = observer(() => {
               </Form>
             </Col>
             <Col>
-              <Button type="primary" href="/spaces/new">创建空间</Button>
+              <Button type="primary" href="/spaces/new">Create Space</Button>
             </Col>
           </Row>
         </PageHeader>

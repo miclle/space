@@ -17,12 +17,12 @@ const NewSpace = observer(() => {
     Space.create(values)
       .then((space: ISpace) => {
         navigate(`/spaces/${space.key}`);
-        notification.success({ message: '创建空间成功' });
+        notification.success({ message: 'Space created successfully.' });
       })
       .catch((resp: AxiosResponse<IErrorMessage>) => {
         notification.error({
           key: 'create-space-error',
-          message: '创建空间失败',
+          message: 'Space creation failure.',
           description: map(resp.data.message, (value, key) => value).join('\n')
         });
       })
@@ -33,12 +33,12 @@ const NewSpace = observer(() => {
       <div className="container">
         <PageHeader
           ghost={false}
-          title="添加空间"
+          title="Create Space"
           breadcrumb={
             <Breadcrumb>
-              <Breadcrumb.Item><Link to="/">首页</Link></Breadcrumb.Item>
-              <Breadcrumb.Item><Link to="/spaces">空间列表</Link></Breadcrumb.Item>
-              <Breadcrumb.Item>添加空间</Breadcrumb.Item>
+              <Breadcrumb.Item><Link to="/">Home</Link></Breadcrumb.Item>
+              <Breadcrumb.Item><Link to="/spaces">Spaces</Link></Breadcrumb.Item>
+              <Breadcrumb.Item>Create Space</Breadcrumb.Item>
             </Breadcrumb>
           }
         />
@@ -54,36 +54,36 @@ const NewSpace = observer(() => {
         >
           <Form.Item
             name="name"
-            label="空间名称"
-            rules={[{ required: true, message: '空间名称不能为空!' }]}
+            label="Space Name"
+            rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
             name="key"
-            label="空间键值 Key"
-            extra="创建空间后，不能修改此键。它将作为唯一标识符出现在空间的 URL 上。"
-            rules={[{ required: true, message: '空间键值 Key 不能为空!' }]}
+            label="Space Key"
+            extra="This key cannot be modified after the space is created. It will appear as a unique identifier on the URL of the space."
+            rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
             name="description"
-            label="空间描述"
+            label="Description"
           >
             <Input.TextArea autoSize={{ minRows: 3 }} />
           </Form.Item>
 
-          <Form.Item name="lang" label="默认语言" initialValue="en-US">
+          <Form.Item name="lang" label="Default Language" initialValue="en-US">
             <Select style={{ width: 200 }}>
               <Select.Option value="en-US">English</Select.Option>
               <Select.Option value="zh-CN">简体中文</Select.Option>
             </Select>
           </Form.Item>
 
-          <Form.Item name="fallback_lang" label="备用语言" initialValue="en-US">
+          <Form.Item name="fallback_lang" label="Fallback Language" initialValue="en-US">
             <Select style={{ width: 200 }}>
               <Select.Option value="en-US">English</Select.Option>
               <Select.Option value="zh-CN">简体中文</Select.Option>
@@ -92,7 +92,7 @@ const NewSpace = observer(() => {
 
           <Form.Item
             name="status"
-            label="空间状态"
+            label="Status"
             initialValue="offline"
           >
             <Radio.Group>
@@ -103,8 +103,8 @@ const NewSpace = observer(() => {
 
           <Form.Item wrapperCol={{ offset: 4, span: 18 }}>
             <AntSpace>
-              <Button type="primary" htmlType="submit">提交</Button>
-              <Link to="/spaces"><Button>取消</Button></Link>
+              <Button type="primary" htmlType="submit">Submit</Button>
+              <Link to="/spaces"><Button>Cancel</Button></Link>
             </AntSpace>
           </Form.Item>
         </Form>

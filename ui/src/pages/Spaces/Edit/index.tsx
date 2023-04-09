@@ -23,12 +23,12 @@ const EditSpace = observer(() => {
 
     store.update(key, update)
       .then((space: ISpace) => {
-        notification.success({ message: '更新空间成功' });
+        notification.success({ message: 'Update space success.' });
       })
       .catch((resp: AxiosResponse<IErrorMessage>) => {
         notification.error({
           key: 'update-space-error',
-          message: '更新空间失败',
+          message: 'Update space failure.',
           description: map(resp.data.message, (value, key) => value).join('\n')
         });
       })
@@ -40,8 +40,8 @@ const EditSpace = observer(() => {
         ghost={false}
         breadcrumb={
           <Breadcrumb>
-            <Breadcrumb.Item><Link to={`/spaces/${space.key}`}>空间首页</Link></Breadcrumb.Item>
-            <Breadcrumb.Item>空间设置</Breadcrumb.Item>
+            <Breadcrumb.Item><Link to={`/spaces/${space.key}`}>Space</Link></Breadcrumb.Item>
+            <Breadcrumb.Item>Settings</Breadcrumb.Item>
           </Breadcrumb>
         }
       />
@@ -57,8 +57,8 @@ const EditSpace = observer(() => {
       >
         <Form.Item
           name="name"
-          label="空间名称"
-          rules={[{ required: true, message: '空间名称不能为空!' }]}
+          label="Space Name"
+          rules={[{ required: true }]}
           initialValue={space.name}
         >
           <Input />
@@ -66,7 +66,7 @@ const EditSpace = observer(() => {
 
         <Form.Item
           name="description"
-          label="空间描述"
+          label="Description"
           initialValue={space.description}
         >
           <Input.TextArea autoSize={{ minRows: 3 }} />
@@ -74,7 +74,7 @@ const EditSpace = observer(() => {
 
         <Form.Item
           name="status"
-          label="空间状态"
+          label="Status"
           initialValue={space.status}
         >
           <Radio.Group>
@@ -83,14 +83,14 @@ const EditSpace = observer(() => {
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item name="lang" label="默认语言" initialValue={space.lang}>
+        <Form.Item name="lang" label="Default Language" initialValue={space.lang}>
           <Select style={{ width: 200 }}>
             <Select.Option value="en-US">English</Select.Option>
             <Select.Option value="zh-CN">简体中文</Select.Option>
           </Select>
         </Form.Item>
 
-        <Form.Item name="fallback_lang" label="备用语言" initialValue={space.fallback_lang}>
+        <Form.Item name="fallback_lang" label="Fallback Language" initialValue={space.fallback_lang}>
           <Select style={{ width: 200 }}>
             <Select.Option value="en-US">English</Select.Option>
             <Select.Option value="zh-CN">简体中文</Select.Option>
@@ -99,8 +99,8 @@ const EditSpace = observer(() => {
 
         <Form.Item wrapperCol={{ offset: 4, span: 18 }}>
           <AntSpace>
-            <Button type="primary" htmlType="submit">保存</Button>
-            <Link to={`/spaces/${space.key}`}><Button>取消</Button></Link>
+            <Button type="primary" htmlType="submit">Submit</Button>
+            <Link to={`/spaces/${space.key}`}><Button>Cancel</Button></Link>
           </AntSpace>
         </Form.Item>
       </Form>
