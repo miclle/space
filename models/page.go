@@ -43,10 +43,9 @@ type Page struct {
 	Lft           int           `json:"lft"            nestedset:"lft"`
 	Depth         int           `json:"depth"          nestedset:"depth"`
 	ChildrenCount int           `json:"children_count" nestedset:"children_count"`
+	SpaceID       int64         `json:"-"              nestedset:"scope"          gorm:"index"`
 
-	SpaceID int64  `json:"-"               gorm:"index"`
-	Space   *Space `json:"space,omitempty"`
-
+	Space   *Space       `json:"space,omitempty"`
 	Content *PageContent `json:"content"`
 }
 
