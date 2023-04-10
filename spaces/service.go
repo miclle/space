@@ -24,7 +24,7 @@ type Service interface {
 	UpdateSpace(context.Context, *params.UpdateSpace) (*models.Space, error)
 
 	CreatePage(context.Context, *params.CreatePage) (*models.Page, error)
-	DescribePages(context.Context, *params.DescribePages) ([]*models.Page, error)
+	DescribePages(context.Context, *params.DescribePages) (*database.Pagination[*models.Page], error)
 	DescribePage(context.Context, *params.DescribePage) (*models.Page, error)
 	UpdatePage(context.Context, *params.UpdatePage) (*models.Page, error)
 
@@ -298,16 +298,20 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 	return page, err
 }
 
-func (s *service) DescribePages(ctx context.Context, params *params.DescribePages) ([]*models.Page, error) {
+func (s *service) DescribePages(ctx context.Context, params *params.DescribePages) (*database.Pagination[*models.Page], error) {
 
 	var (
-		database = s.Database.WithContext(ctx)
-		space    *models.Space
-		pages    []*models.Page
+		database   = s.Database.WithContext(ctx)
+		pagination = &params.Pagination
+		space      *models.Space
 	)
 
 	err := database.Where("`id` = ?", params.SpaceID).First(&space).Error
 	if err != nil {
+		return nil, err
+	}
+
+	if err := database.Model(&pagination.Items).Count(&pagination.Total).Error; err != nil {
 		return nil, err
 	}
 
@@ -321,6 +325,8 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 	// 	database = database.Where("`version` = ?", params.Version)
 	// }
 
+	var pages models.Pages
+
 	err = database.
 		Joins("Content", database.Where(&models.PageContent{Lang: lang})).
 		Where("`space_pages`.`space_id` = ?", space.ID).
@@ -328,7 +334,13 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 		Find(&pages).
 		Error
 
-	return pages, err
+	if params.View == "list" {
+		pages = pages.Build()
+	}
+
+	pagination.Items = pages
+
+	return pagination, err
 }
 
 func (s *service) DescribePage(ctx context.Context, params *params.DescribePage) (*models.Page, error) {

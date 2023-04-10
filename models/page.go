@@ -47,6 +47,9 @@ type Page struct {
 
 	Space   *Space       `json:"space,omitempty"`
 	Content *PageContent `json:"content"`
+
+	Children []*Page `json:"children,omitempty" gorm:"-"`
+	Parents  []*Page `json:"parents,omitempty"  gorm:"-"`
 }
 
 // TableName user model table name
@@ -93,4 +96,31 @@ type PageContent struct {
 // TableName user model table name
 func (PageContent) TableName() string {
 	return "space_page_contents"
+}
+
+// Pages pages type
+type Pages []*Page
+
+// Build tree
+func (nodes *Pages) Build() Pages {
+
+	var (
+		root    = Pages{}
+		nodeMap = make(map[int64]*Page)
+	)
+
+	for _, node := range *nodes {
+		nodeMap[node.ID] = node
+		if node.ParentID.Int64 == 0 {
+			root = append(root, node)
+		}
+	}
+
+	for _, node := range *nodes {
+		if parent, exists := nodeMap[node.ParentID.Int64]; exists {
+			parent.Children = append(parent.Children, node)
+		}
+	}
+
+	return root
 }

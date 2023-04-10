@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"github.com/fox-gonic/fox/database"
 	"github.com/fox-gonic/fox/engine"
 
 	"github.com/miclle/space/models"
@@ -59,7 +60,7 @@ type DescribePagesArgs struct {
 
 // DescribePages describe pages
 // GET /api/spaces/:key/pages
-func (actions *Actions) DescribePages(c *engine.Context, args *DescribePagesArgs) ([]*models.Page, error) {
+func (actions *Actions) DescribePages(c *engine.Context, args *DescribePagesArgs) (*database.Pagination[*models.Page], error) {
 
 	var (
 		space  = c.MustGet("space").(*models.Space)
