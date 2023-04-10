@@ -18,6 +18,7 @@ export interface IPage {
   created_at: number
   updated_at: number
 
+  children: IPage[]
   parents?: IPageParent[]
 }
 

@@ -3,24 +3,23 @@ import { observer } from "mobx-react-lite";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import { StringParam, useQueryParams, withDefault } from "use-query-params";
-import { Avatar, Button, Empty, Layout, Menu, Select, Skeleton } from "antd";
+import { Avatar, Empty, Layout, Menu, Select, Skeleton, Tree } from "antd";
 import { ItemType } from "antd/es/menu/hooks/useItems";
-import { NodeRendererProps, Tree } from "react-arborist";
 import { AiOutlinePlusSquare, AiOutlineSetting } from "react-icons/ai";
-import { MdKeyboardArrowDown, MdKeyboardArrowRight } from "react-icons/md";
-import { BsBoxSeam, BsDot } from "react-icons/bs";
+import { MdKeyboardArrowDown } from "react-icons/md";
+import { BsBoxSeam } from "react-icons/bs";
 
-import { IPageTree, IPageTreeNode, ISpace } from "models";
-import { Page } from "services";
+import { IPage, ISpace } from "models";
+import { IPagination, Page, PaginationDefault } from "services";
 
-import { ClusterStore, SpaceContext } from "./store";
+import { SpaceStore, SpaceContext } from "./store";
 
 const Spaces = observer(() => {
 
   const { key, page_id } = useParams() as { key: string, page_id: string };
   const location = useLocation();
 
-  const store = useMemo<ClusterStore>(() => new ClusterStore(), []);
+  const store = useMemo<SpaceStore>(() => new SpaceStore(), []);
   const { space } = store;
 
   const [menuItems, setMenuItems] = useState<ItemType[]>([]);
@@ -28,9 +27,10 @@ const Spaces = observer(() => {
 
   const [query, setQuery] = useQueryParams({
     lang: withDefault(StringParam, space.lang),
+    view: withDefault(StringParam, 'tree'),
   });
 
-  const [tree, setTree] = useState<IPageTree>([])
+  const [treeData, setTreeData] = useState<IPage[]>([])
 
   const {
     isLoading,
@@ -40,10 +40,12 @@ const Spaces = observer(() => {
 
   const {
     isLoading: pageTreeIsLoading,
-  } = useQuery<IPageTree>(['spaces.pages.tree', key, query.lang], () => Page.tree(key, query), {
+  } = useQuery<IPagination<IPage>>(['spaces.pages.tree', key, query], () => Page.list(key, query), {
     enabled: key !== '',
+    initialData: PaginationDefault,
     onSuccess: (data) => {
-      setTree(data)
+      setTreeData(data.items)
+      console.log(data.items)
     },
   })
 
@@ -64,8 +66,8 @@ const Spaces = observer(() => {
         label: <>
           {
             page_id && page_id !== `${space.homepage_id}`
-            ? <Link to={`/spaces/${space.key}/pages/new?parent_id=${page_id}`}>Create a page</Link>
-            : <Link to={`/spaces/${space.key}/pages/new`}>Create a page</Link>
+              ? <Link to={`/spaces/${space.key}/pages/new?parent_id=${page_id}`}>Create a page</Link>
+              : <Link to={`/spaces/${space.key}/pages/new`}>Create a page</Link>
           }
         </>
       },
@@ -114,37 +116,34 @@ const Spaces = observer(() => {
               pageTreeIsLoading && <Skeleton active />
             }
 
-            <Select
-              style={{ width: '100%', marginBottom: 12 }}
-              defaultValue={query.lang}
-              onChange={(lang) => setQuery({ ...query, lang })}
-            >
-              <Select.Option value="en-US">English</Select.Option>
-              <Select.Option value="zh-CN">简体中文</Select.Option>
-            </Select>
+            {
+              !pageTreeIsLoading && <>
+                <Select
+                  style={{ width: '100%', marginBottom: 12 }}
+                  defaultValue={query.lang}
+                  onChange={(lang) => setQuery({ ...query, lang })}
+                >
+                  <Select.Option value="en-US">English</Select.Option>
+                  <Select.Option value="zh-CN">简体中文</Select.Option>
+                </Select>
 
-            <Tree<IPageTreeNode>
-              data={tree}
-              width="100%"
-            >
-              {({ node, style }: NodeRendererProps<IPageTreeNode>) => {
-                /* This node instance can do many things. See the API reference. */
-                return (
-                  <div style={style}>
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={
-                        node.isLeaf ? <BsDot /> :
-                          node.isClosed ? <MdKeyboardArrowRight /> : <MdKeyboardArrowDown />
-                      }
-                      onClick={() => node.toggle()}
-                    />
-                    <Link to={`/spaces/${space.key}/pages/${node.data.id}`}>{node.data.short_title}</Link>
-                  </div>
-                );
-              }}
-            </Tree>
+                <Tree
+                  showLine={true}
+                  fieldNames={{ title: 'id', key: 'id' }}
+                  treeData={treeData as any}
+                  draggable={{ icon: false }}
+                  blockNode
+                  autoExpandParent
+                  switcherIcon={
+                    <span className="anticon anticon-down app-tree-switcher-icon" style={{ fontSize: 14 }}>
+                      <MdKeyboardArrowDown size={14} />
+                    </span>
+                  }
+                />
+                {/* <Link to={`/spaces/${space.key}/pages/${node.data.id}`}>{node.data.short_title}</Link> */}
+              </>
+            }
+
           </div>
         </div>
       </Layout.Sider>

@@ -4,7 +4,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import { IPageTree, ISpace } from "models";
 import { Space } from "services";
 
-export class ClusterStore {
+export class SpaceStore {
 
   space: ISpace = {} as ISpace
 
@@ -31,6 +31,6 @@ export class ClusterStore {
   }
 }
 
-export const SpaceContext = React.createContext<ClusterStore>({} as any);
+export const SpaceContext = React.createContext<SpaceStore>({} as any);
 
 export const useSpaceContext = () => React.useContext(SpaceContext);
