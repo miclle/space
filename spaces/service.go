@@ -328,6 +328,7 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 	var pages models.Pages
 
 	err = database.
+		Scopes(pagination.Paginate()).
 		Joins("Content", database.Where(&models.PageContent{Lang: lang})).
 		Where("`space_pages`.`space_id` = ?", space.ID).
 		Order("`lft` ASC").

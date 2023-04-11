@@ -45,7 +45,6 @@ const Spaces = observer(() => {
     initialData: PaginationDefault,
     onSuccess: (data) => {
       setTreeData(data.items)
-      console.log(data.items)
     },
   })
 
@@ -129,7 +128,7 @@ const Spaces = observer(() => {
 
                 <Tree
                   showLine={true}
-                  fieldNames={{ title: 'id', key: 'id' }}
+                  fieldNames={{ title: 'title', key: 'id' }}
                   treeData={treeData as any}
                   draggable={{ icon: false }}
                   blockNode

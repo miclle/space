@@ -46,7 +46,7 @@ type Page struct {
 	SpaceID       int64         `json:"-"              nestedset:"scope"          gorm:"index"`
 
 	Space   *Space       `json:"space,omitempty"`
-	Content *PageContent `json:"content"`
+	Content *PageContent `json:"-"`
 
 	Children []*Page `json:"children,omitempty" gorm:"-"`
 	Parents  []*Page `json:"parents,omitempty"  gorm:"-"`
@@ -61,11 +61,13 @@ func (Page) TableName() string {
 func (page *Page) MarshalJSON() ([]byte, error) {
 	type Alias Page
 	return json.Marshal(&struct {
-		ParentID int64 `json:"parent_id"`
 		*Alias
+		ParentID int64 `json:"parent_id"`
+		*PageContent
 	}{
-		ParentID: page.ParentID.Int64,
-		Alias:    (*Alias)(page),
+		ParentID:    page.ParentID.Int64,
+		Alias:       (*Alias)(page),
+		PageContent: (*PageContent)(page.Content),
 	})
 }
 
