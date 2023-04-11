@@ -37,13 +37,13 @@ func (t PageStatus) IsValid() error {
 
 // Page page meta model
 type Page struct {
-	ID            int64         `json:"id"             nestedset:"id"             gorm:"primaryKey;autoIncrement"`
-	ParentID      sql.NullInt64 `json:"parent_id"      nestedset:"parent_id"      gorm:"index"`
-	Rgt           int           `json:"rgt"            nestedset:"rgt"`
-	Lft           int           `json:"lft"            nestedset:"lft"`
-	Depth         int           `json:"depth"          nestedset:"depth"`
-	ChildrenCount int           `json:"children_count" nestedset:"children_count"`
-	SpaceID       int64         `json:"-"              nestedset:"scope"          gorm:"index"`
+	ID            int64         `json:"id"        nestedset:"id"             gorm:"primaryKey;autoIncrement"`
+	ParentID      sql.NullInt64 `json:"parent_id" nestedset:"parent_id"      gorm:"index"`
+	Rgt           int           `json:"-"         nestedset:"rgt"`
+	Lft           int           `json:"-"         nestedset:"lft"`
+	Depth         int           `json:"-"         nestedset:"depth"`
+	ChildrenCount int           `json:"-"         nestedset:"children_count"`
+	SpaceID       int64         `json:"-"         nestedset:"scope"          gorm:"index"`
 
 	Space   *Space       `json:"space,omitempty"`
 	Content *PageContent `json:"-"`
