@@ -327,10 +327,15 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 
 	var pages models.Pages
 
-	err = database.
+	db := database.
 		Scopes(pagination.Paginate()).
-		Joins("Content", database.Where(&models.PageContent{Lang: lang})).
-		Where("`space_pages`.`space_id` = ?", space.ID).
+		Joins("Content", database.Where(&models.PageContent{Lang: lang}))
+
+	if lang != space.Lang {
+		db = db.Joins("FallbackContent", database.Where(&models.PageContent{Lang: space.FallbackLang}))
+	}
+
+	err = db.Where("`space_pages`.`space_id` = ?", space.ID).
 		Order("`lft` ASC").
 		Find(&pages).
 		Error

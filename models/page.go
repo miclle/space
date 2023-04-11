@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 )
 
@@ -45,8 +46,9 @@ type Page struct {
 	ChildrenCount int           `json:"-"         nestedset:"children_count"`
 	SpaceID       int64         `json:"-"         nestedset:"scope"          gorm:"index"`
 
-	Space   *Space       `json:"space,omitempty"`
-	Content *PageContent `json:"-"`
+	Space           *Space       `json:"space,omitempty"`
+	Content         *PageContent `json:"-"`
+	FallbackContent *PageContent `json:"-"`
 
 	Children []*Page `json:"children,omitempty" gorm:"-"`
 	Parents  []*Page `json:"parents,omitempty"  gorm:"-"`
@@ -55,6 +57,14 @@ type Page struct {
 // TableName user model table name
 func (Page) TableName() string {
 	return "space_pages"
+}
+
+// AfterFind gorm after find callback
+func (page *Page) AfterFind(tx *gorm.DB) error {
+	if page.Content == nil {
+		page.Content = page.FallbackContent
+	}
+	return nil
 }
 
 // MarshalJSON implement
