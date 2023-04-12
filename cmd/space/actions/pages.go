@@ -92,9 +92,9 @@ type DescribePageArgs struct {
 
 // DescribePage describe page detail
 // GET /api/spaces/:key/pages/:id
-func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) (*models.PageContent, error) {
+func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) (*models.Page, error) {
 
-	var page = c.MustGet("page").(*models.PageContent)
+	var page = c.MustGet("page").(*models.Page)
 
 	return page, nil
 }

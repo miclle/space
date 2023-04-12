@@ -306,8 +306,7 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 		space      *models.Space
 	)
 
-	err := database.Where("`id` = ?", params.SpaceID).First(&space).Error
-	if err != nil {
+	if err := database.Where("`id` = ?", params.SpaceID).First(&space).Error; err != nil {
 		return nil, err
 	}
 
@@ -329,16 +328,20 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 
 	db := database.
 		Scopes(pagination.Paginate()).
-		Joins("Content", database.Where(&models.PageContent{Lang: lang}))
+		Joins("Content", database.Omit("body", "html").Where(&models.PageContent{Lang: lang}))
 
-	if lang != space.Lang {
-		db = db.Joins("FallbackContent", database.Where(&models.PageContent{Lang: space.FallbackLang}))
+	if len(space.FallbackLang) > 0 && lang != space.FallbackLang {
+		db = db.Joins("FallbackContent", database.Omit("body", "html").Where(&models.PageContent{Lang: space.FallbackLang}))
 	}
 
-	err = db.Where("`space_pages`.`space_id` = ?", space.ID).
-		Order("`lft` ASC").
-		Find(&pages).
-		Error
+	if params.View == "list" {
+		db = db.Where("`space_pages`.`depth` <= ?", params.Depth)
+	}
+
+	err := db.Where("`space_pages`.`space_id` = ?", space.ID).Order("`lft` ASC").Find(&pages).Error
+	if err != nil {
+		return nil, err
+	}
 
 	if params.View == "list" {
 		pages = pages.Build()
@@ -346,7 +349,7 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 
 	pagination.Items = pages
 
-	return pagination, err
+	return pagination, nil
 }
 
 func (s *service) DescribePage(ctx context.Context, params *params.DescribePage) (*models.Page, error) {
@@ -357,8 +360,7 @@ func (s *service) DescribePage(ctx context.Context, params *params.DescribePage)
 		page     *models.Page
 	)
 
-	err := database.Where("`id` = ?", params.SpaceID).First(&space).Error
-	if err != nil {
+	if err := database.Where("`id` = ?", params.SpaceID).First(&space).Error; err != nil {
 		return nil, err
 	}
 
@@ -371,14 +373,13 @@ func (s *service) DescribePage(ctx context.Context, params *params.DescribePage)
 		database = database.Where("`version` = ?", params.Version)
 	}
 
-	err = database.Where("`space_id` = ? AND `page_id` = ? AND `lang` = ?", space.ID, params.PageID, lang).First(&page).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		err = database.Where("`space_id` = ? AND `page_id` = ? AND `lang` = ?", space.ID, params.PageID, space.FallbackLang).First(&page).Error
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, gorm.ErrRecordNotFound
-		}
+	database = database.Joins("Content", database.Where(&models.PageContent{Lang: lang}))
+
+	if len(space.FallbackLang) > 0 && lang != space.FallbackLang {
+		database = database.Joins("FallbackContent", database.Where(&models.PageContent{Lang: space.FallbackLang}))
 	}
 
+	err := database.Where("`space_pages`.`space_id` = ? AND `page_id` = ?", space.ID, params.PageID).Find(&page).Error
 	if err != nil {
 		return nil, err
 	}
