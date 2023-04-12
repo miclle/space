@@ -138,8 +138,10 @@ const Spaces = observer(() => {
                       <MdKeyboardArrowDown size={14} />
                     </span>
                   }
+                  titleRender={(node: any) =>
+                    <Link to={`/spaces/${space.key}/pages/${node.id}`}>{node.short_title}</Link>
+                  }
                 />
-                {/* <Link to={`/spaces/${space.key}/pages/${node.data.id}`}>{node.data.short_title}</Link> */}
               </>
             }
 
