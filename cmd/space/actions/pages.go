@@ -12,16 +12,14 @@ import (
 
 // CreatePageArgs create page args
 type CreatePageArgs struct {
-	ParentID        int64             `json:"parent_id"`
-	PageID          int64             `json:"page_id"`
-	Lang            string            `json:"lang"`
-	Version         string            `json:"version"`
-	Status          models.PageStatus `json:"status"`
-	Title           string            `json:"title"`
-	ShortTitle      string            `json:"short_title"`
-	Body            string            `json:"body"`
-	MetaKeywords    []string          `json:"meta_keywords"`
-	MetaDescription string            `json:"meta_description"`
+	ParentID   int64             `json:"parent_id"`
+	PageID     int64             `json:"page_id"`
+	Lang       string            `json:"lang"`
+	Version    string            `json:"version"`
+	Status     models.PageStatus `json:"status"`
+	Title      string            `json:"title"`
+	ShortTitle string            `json:"short_title"`
+	Body       string            `json:"body"`
 }
 
 // CreatePage create page
@@ -32,17 +30,15 @@ func (actions *Actions) CreatePage(c *engine.Context, args *CreatePageArgs) (*mo
 		space   = c.MustGet("space").(*models.Space)
 		account = c.MustGet("account").(*models.Account)
 		params  = &params.CreatePage{
-			SpaceID:         space.ID,
-			CreatorID:       account.ID,
-			ParentID:        args.ParentID,
-			Lang:            args.Lang,
-			Version:         args.Version,
-			Status:          args.Status,
-			Title:           args.Title,
-			ShortTitle:      args.ShortTitle,
-			Body:            args.Body,
-			MetaKeywords:    args.MetaKeywords,
-			MetaDescription: args.MetaDescription,
+			SpaceID:    space.ID,
+			CreatorID:  account.ID,
+			ParentID:   args.ParentID,
+			Lang:       args.Lang,
+			Version:    args.Version,
+			Status:     args.Status,
+			Title:      args.Title,
+			ShortTitle: args.ShortTitle,
+			Body:       args.Body,
 		}
 	)
 
@@ -103,31 +99,27 @@ func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) 
 
 // UpdatePageArgs update page args
 type UpdatePageArgs struct {
-	Lang            *string            `json:"lang"`
-	Version         *string            `json:"version"`
-	Status          *models.PageStatus `json:"status"`
-	Title           *string            `json:"title"`
-	ShortTitle      *string            `json:"short_title"`
-	Body            *string            `json:"body"`
-	MetaKeywords    *[]string          `json:"meta_keywords"`
-	MetaDescription *string            `json:"meta_description"`
+	Lang       *string            `json:"lang"`
+	Version    *string            `json:"version"`
+	Status     *models.PageStatus `json:"status"`
+	Title      *string            `json:"title"`
+	ShortTitle *string            `json:"short_title"`
+	Body       *string            `json:"body"`
 }
 
 // UpdatePage update page
 // PATCH /api/spaces/:key/pages/:id
 func (actions *Actions) UpdatePage(c *engine.Context, args *UpdatePageArgs) (*models.Page, error) {
 	var (
-		page   = c.MustGet("page").(*models.PageContent)
+		page   = c.MustGet("page").(*models.Page)
 		params = &params.UpdatePage{
-			ID:              page.ID,
-			Lang:            args.Lang,
-			Version:         args.Version,
-			Status:          args.Status,
-			Title:           args.Title,
-			ShortTitle:      args.ShortTitle,
-			Body:            args.Body,
-			MetaKeywords:    args.MetaKeywords,
-			MetaDescription: args.MetaDescription,
+			ID:         page.ID,
+			Lang:       args.Lang,
+			Version:    args.Version,
+			Status:     args.Status,
+			Title:      args.Title,
+			ShortTitle: args.ShortTitle,
+			Body:       args.Body,
 		}
 	)
 

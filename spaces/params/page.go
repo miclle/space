@@ -7,17 +7,15 @@ import (
 
 // CreatePage create page params
 type CreatePage struct {
-	SpaceID         int64
-	CreatorID       int64
-	ParentID        int64
-	Lang            string
-	Version         string
-	Status          models.PageStatus
-	Title           string
-	ShortTitle      string
-	Body            string
-	MetaKeywords    []string
-	MetaDescription string
+	SpaceID    int64
+	CreatorID  int64
+	ParentID   int64
+	Lang       string
+	Version    string
+	Status     models.PageStatus
+	Title      string
+	ShortTitle string
+	Body       string
 }
 
 // DescribePages describe page detail params
@@ -40,15 +38,13 @@ type DescribePage struct {
 
 // UpdatePage update page params
 type UpdatePage struct {
-	ID              int64
-	Lang            *string
-	Version         *string
-	Status          *models.PageStatus
-	Title           *string
-	ShortTitle      *string
-	Body            *string
-	MetaKeywords    *[]string
-	MetaDescription *string
+	ID         int64
+	Lang       *string
+	Version    *string
+	Status     *models.PageStatus
+	Title      *string
+	ShortTitle *string
+	Body       *string
 }
 
 // Search page params
