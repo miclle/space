@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Link, useNavigate } from 'react-router-dom';
 import { map } from 'lodash';
-import { Breadcrumb, Button, Form, Input, Layout, notification, Radio, Select, Space as AntSpace } from 'antd';
+import { Button, Form, Input, Layout, notification, Radio, Select, Space as AntSpace } from 'antd';
 import { PageHeader } from '@ant-design/pro-components';
 
 import { ISpace } from 'models';
@@ -34,13 +34,13 @@ const NewSpace = observer(() => {
         <PageHeader
           ghost={false}
           title="Create Space"
-          breadcrumb={
-            <Breadcrumb>
-              <Breadcrumb.Item><Link to="/">Home</Link></Breadcrumb.Item>
-              <Breadcrumb.Item><Link to="/spaces">Spaces</Link></Breadcrumb.Item>
-              <Breadcrumb.Item>Create Space</Breadcrumb.Item>
-            </Breadcrumb>
-          }
+          breadcrumb={{
+            items: [
+              { title: <Link to="/">Home</Link> },
+              { title: <Link to="/spaces">Spaces</Link> },
+              { title: 'Create Space' },
+            ]
+          }}
         />
 
         <Form<Partial<ISpace>>

@@ -62,17 +62,15 @@ const EditPage = observer(() => {
     <>
       <Row>
         <Col flex="auto">
-          <Breadcrumb>
-            <Breadcrumb.Item><Link to={`/spaces/${space.key}`}>{space.name}</Link></Breadcrumb.Item>
-            {
-              page.parents?.map((parent) => <Breadcrumb.Item key={parent.id}>
-                <Link to={`/spaces/${space.key}/pages/${parent.id}`}>{parent.short_title}</Link>
-              </Breadcrumb.Item>)
-            }
-            <Breadcrumb.Item>{page.title}</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            items={[
+              { title: <Link to={`/spaces/${space.key}`}>{space.name}</Link> },
+              ...(page.parents?.map((parent) => ({ title: <Link to={`/spaces/${space.key}/pages/${parent.id}`}>{parent.short_title}</Link> })) || []),
+              { title: page.title }
+            ]}
+          />
         </Col>
-      </Row>
+      </Row >
 
       <Form
         name="page-form"

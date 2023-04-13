@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { Link, useParams } from "react-router-dom";
 import { map } from "lodash";
-import { Breadcrumb, Button, Form, Input, notification, Radio, Select, Space as AntSpace } from "antd";
+import { Button, Form, Input, notification, Radio, Select, Space as AntSpace } from "antd";
 import { PageHeader } from '@ant-design/pro-components';
 
 import { ISpace } from 'models';
@@ -38,12 +38,12 @@ const EditSpace = observer(() => {
     <>
       <PageHeader
         ghost={false}
-        breadcrumb={
-          <Breadcrumb>
-            <Breadcrumb.Item><Link to={`/spaces/${space.key}`}>Space</Link></Breadcrumb.Item>
-            <Breadcrumb.Item>Settings</Breadcrumb.Item>
-          </Breadcrumb>
-        }
+        breadcrumb={{
+          items: [
+            { title: <Link to={`/spaces/${space.key}`}>Space</Link> },
+            { title: 'Settings' },
+          ]
+        }}
       />
 
       <Form<Partial<ISpace>>

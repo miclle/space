@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NumberParam, StringParam, useQueryParams } from "use-query-params";
 import { map } from "lodash";
-import { Breadcrumb, Button, Col, Form, Input, notification, Row, Typography } from "antd";
+import { Button, Col, Form, Input, notification, Row, Typography } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 
 import { AxiosResponse, IErrorMessage, Page } from "services";
@@ -58,24 +58,14 @@ const NewPage = observer(() => {
     <>
       <PageHeader
         ghost={false}
-        breadcrumb={
-          <Breadcrumb>
-            <Breadcrumb.Item><Link to={`/spaces/${space.key}`}>{space.name}</Link></Breadcrumb.Item>
-            {
-              parentPage &&
-              parentPage.parents?.map((parent) => <Breadcrumb.Item key={parent.id}>
-                <Link to={`/spaces/${space.key}/pages/${parent.id}`}>{parent.short_title}</Link>
-              </Breadcrumb.Item>)
-            }
-            {
-              parentPage &&
-              <Breadcrumb.Item key={parentPage.id}>
-                <Link to={`/spaces/${space.key}/pages/${parentPage.id}`}>{parentPage.short_title}</Link>
-              </Breadcrumb.Item>
-            }
-            <Breadcrumb.Item>Add page</Breadcrumb.Item>
-          </Breadcrumb>
-        }
+        breadcrumb={{
+          items: [
+            { title: <Link to={`/spaces/${space.key}`}>{space.name}</Link> },
+            ...(parentPage?.parents?.map((parent) => ({ title: <Link to={`/spaces/${space.key}/pages/${parent.id}`}>{parent.short_title}</Link> })) || []),
+            ...(parentPage ? [{ title: <Link to={`/spaces/${space.key}/pages/${parentPage.id}`}>{parentPage.short_title}</Link> }] : []),
+            { title: 'Add page' }
+          ]
+        }}
       />
 
       <Form
