@@ -394,7 +394,7 @@ func (s *service) UpdatePage(ctx context.Context, params *params.UpdatePage) (*m
 		page     *models.Page
 	)
 
-	err := database.Where("`id` = ?", params.ID).First(&page).Error
+	err := database.Where("`id` = ?", params.ID).Preload("Space").First(&page).Error
 	if err != nil {
 		return nil, err
 	}
@@ -403,31 +403,39 @@ func (s *service) UpdatePage(ctx context.Context, params *params.UpdatePage) (*m
 		return nil, err
 	}
 
+	db := database.Where("`page_id` = ?", page.ID)
+
 	if params.Lang != nil {
-		// page.Lang = *params.Lang
+		db = db.Where("`lang` = ?", *params.Lang)
 	}
 	if params.Version != nil {
-		// page.Version = *params.Version
-	}
-	if params.Status != nil {
-		// page.Status = *params.Status
-	}
-	if params.Title != nil {
-		// page.Title = *params.Title
-	}
-	if params.ShortTitle != nil {
-		// page.ShortTitle = *params.ShortTitle
-	}
-	if params.Body != nil {
-		// html, err := markdown.Parse(*params.Body)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		// page.Body = *params.Body
-		// page.HTML = html
+		db = db.Where("`version` = ?", *params.Version)
 	}
 
-	err = database.Save(page).Error
+	err = db.First(&page.Content).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if params.Status != nil {
+		page.Content.Status = *params.Status
+	}
+	if params.Title != nil {
+		page.Content.Title = *params.Title
+	}
+	if params.ShortTitle != nil {
+		page.Content.ShortTitle = *params.ShortTitle
+	}
+	if params.Body != nil {
+		html, err := markdown.Parse(*params.Body)
+		if err != nil {
+			return nil, err
+		}
+		page.Content.Body = *params.Body
+		page.Content.HTML = html
+	}
+
+	err = database.Save(page.Content).Error
 
 	return page, err
 }
