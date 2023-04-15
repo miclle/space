@@ -29,8 +29,6 @@ const Spaces = observer(() => {
     lang: withDefault(StringParam, space.lang),
   });
 
-  const [treeData, setTreeData] = useState<IPage[]>([])
-
   const {
     isLoading,
   } = useQuery<ISpace>(['spaces.get', key], () => store.load(key), {
@@ -38,13 +36,11 @@ const Spaces = observer(() => {
   })
 
   const {
+    data: pages,
     isLoading: pageTreeIsLoading,
   } = useQuery<IPage[]>(['spaces.pages', key, query], () => Page.list(key, query), {
     enabled: key !== '',
     initialData: [],
-    onSuccess: (data) => {
-      setTreeData(data)
-    },
   })
 
   useEffect(() => {
@@ -128,7 +124,7 @@ const Spaces = observer(() => {
                 <Tree
                   showLine={true}
                   fieldNames={{ title: 'title', key: 'id' }}
-                  treeData={treeData as any}
+                  treeData={pages as any}
                   draggable={{ icon: false }}
                   blockNode
                   autoExpandParent

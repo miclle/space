@@ -235,6 +235,7 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 	var (
 		database = s.Database.WithContext(ctx)
 		space    *models.Space
+		parent   *models.Page
 		page     *models.Page
 		content  *models.PageContent
 	)
@@ -253,6 +254,12 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 		return nil, err
 	}
 
+	if params.ParentID > 0 {
+		if err := database.Where("`id` = ?", page.ParentID).Find(&parent).Error; err != nil {
+			return nil, err
+		}
+	}
+
 	err = database.Transaction(func(tx *gorm.DB) error {
 
 		page = &models.Page{
@@ -260,8 +267,10 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 			ParentID: sql.NullInt64{Valid: true, Int64: params.ParentID},
 		}
 
-		if err := tx.Create(page).Error; err != nil {
-			return err
+		if parent != nil {
+			nestedset.Create(tx, page, parent)
+		} else {
+			nestedset.Create(tx, page, nil)
 		}
 
 		content = &models.PageContent{

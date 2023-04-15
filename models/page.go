@@ -40,8 +40,8 @@ func (t PageStatus) IsValid() error {
 type Page struct {
 	ID            int64         `json:"id"        nestedset:"id"             gorm:"primaryKey;autoIncrement"`
 	ParentID      sql.NullInt64 `json:"parent_id" nestedset:"parent_id"      gorm:"index"`
-	Rgt           int           `json:"-"         nestedset:"rgt"`
 	Lft           int           `json:"-"         nestedset:"lft"`
+	Rgt           int           `json:"-"         nestedset:"rgt"`
 	Depth         int           `json:"-"         nestedset:"depth"`
 	ChildrenCount int           `json:"-"         nestedset:"children_count"`
 	SpaceID       int64         `json:"-"         nestedset:"scope"          gorm:"index"`
