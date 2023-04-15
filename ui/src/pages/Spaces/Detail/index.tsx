@@ -10,7 +10,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { BsBoxSeam } from "react-icons/bs";
 
 import { IPage, ISpace } from "models";
-import { IPagination, Page, PaginationDefault } from "services";
+import { Page } from "services";
 
 import { SpaceStore, SpaceContext } from "./store";
 
@@ -27,7 +27,6 @@ const Spaces = observer(() => {
 
   const [query, setQuery] = useQueryParams({
     lang: withDefault(StringParam, space.lang),
-    view: withDefault(StringParam, 'tree'),
   });
 
   const [treeData, setTreeData] = useState<IPage[]>([])
@@ -40,11 +39,11 @@ const Spaces = observer(() => {
 
   const {
     isLoading: pageTreeIsLoading,
-  } = useQuery<IPagination<IPage>>(['spaces.pages.tree', key, query], () => Page.list(key, query), {
+  } = useQuery<IPage[]>(['spaces.pages', key, query], () => Page.list(key, query), {
     enabled: key !== '',
-    initialData: PaginationDefault,
+    initialData: [],
     onSuccess: (data) => {
-      setTreeData(data.items)
+      setTreeData(data)
     },
   })
 

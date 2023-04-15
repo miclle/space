@@ -21,11 +21,11 @@ type CreatePage struct {
 // DescribePages describe page detail params
 type DescribePages struct {
 	database.Pagination[*models.Page]
-	SpaceID int64
-	Lang    string
-	Version string
-	Depth   string
-	View    string // list | tree
+	SpaceID  int64
+	Lang     string
+	Version  string
+	Depth    int
+	ParentID *int64
 }
 
 // DescribePage describe page detail params

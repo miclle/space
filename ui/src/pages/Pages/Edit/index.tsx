@@ -36,7 +36,7 @@ const EditPage = observer(() => {
   const handleFormFinish = async (values: Page.IUpdatePageArgs) => {
     Page.update(space.key, page_id, values)
       .then((page: IPage) => {
-        client.prefetchQuery(['spaces.pages.tree', space.key, page.lang]);
+        client.prefetchQuery(['spaces.pages', space.key, page.lang]);
         client.setQueryData(['spaces.pages.get', page_id], page);
         navigate(`/spaces/${space.key}/pages/${page.id}?lang=${page.lang}`);
         notification.success({ message: 'Page updated successfully' });

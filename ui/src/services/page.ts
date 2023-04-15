@@ -1,6 +1,5 @@
 import { GET, PATCH, POST } from './lib/http';
 import { Nullish } from './lib/types';
-import { IPagination } from './pagination';
 
 import { IPage, IPageTree, PageStatus } from 'models';
 
@@ -20,10 +19,10 @@ export function create(spaceKey: string, args: ICreatePageArgs): Promise<IPage> 
 export interface IGetPageParams {
   lang?:    string | Nullish
   version?: string | Nullish
-  view?:    string | Nullish
+  depth?:   number | Nullish
 }
 
-export function list(spaceKey: string, params?: IGetPageParams): Promise<IPagination<IPage>> {
+export function list(spaceKey: string, params?: IGetPageParams): Promise<IPage[]> {
   return GET(`/spaces/${spaceKey}/pages`, { params })
 }
 

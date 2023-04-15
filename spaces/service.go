@@ -24,7 +24,7 @@ type Service interface {
 	UpdateSpace(context.Context, *params.UpdateSpace) (*models.Space, error)
 
 	CreatePage(context.Context, *params.CreatePage) (*models.Page, error)
-	DescribePages(context.Context, *params.DescribePages) (*database.Pagination[*models.Page], error)
+	DescribePages(context.Context, *params.DescribePages) ([]*models.Page, error)
 	DescribePage(context.Context, *params.DescribePage) (*models.Page, error)
 	UpdatePage(context.Context, *params.UpdatePage) (*models.Page, error)
 
@@ -298,19 +298,14 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 	return page, err
 }
 
-func (s *service) DescribePages(ctx context.Context, params *params.DescribePages) (*database.Pagination[*models.Page], error) {
+func (s *service) DescribePages(ctx context.Context, params *params.DescribePages) ([]*models.Page, error) {
 
 	var (
-		database   = s.Database.WithContext(ctx)
-		pagination = &params.Pagination
-		space      *models.Space
+		database = s.Database.WithContext(ctx)
+		space    *models.Space
 	)
 
 	if err := database.Where("`id` = ?", params.SpaceID).First(&space).Error; err != nil {
-		return nil, err
-	}
-
-	if err := database.Model(&pagination.Items).Count(&pagination.Total).Error; err != nil {
 		return nil, err
 	}
 
@@ -326,16 +321,18 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 
 	var pages models.Pages
 
-	db := database.
-		Scopes(pagination.Paginate()).
-		Joins("Content", database.Omit("body", "html").Where(&models.PageContent{Lang: lang}))
+	db := database.Joins("Content", database.Omit("body", "html").Where(&models.PageContent{Lang: lang}))
 
 	if len(space.FallbackLang) > 0 && lang != space.FallbackLang {
 		db = db.Joins("FallbackContent", database.Omit("body", "html").Where(&models.PageContent{Lang: space.FallbackLang}))
 	}
 
-	if params.View == "list" {
+	if params.Depth > 0 {
 		db = db.Where("`space_pages`.`depth` <= ?", params.Depth)
+	}
+
+	if params.ParentID != nil {
+		db = db.Where("`space_pages`.`parent_id` = ?", *params.ParentID)
 	}
 
 	err := db.Where("`space_pages`.`space_id` = ?", space.ID).Order("`lft` ASC").Find(&pages).Error
@@ -343,13 +340,7 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 		return nil, err
 	}
 
-	if params.View == "list" {
-		pages = pages.Build()
-	}
-
-	pagination.Items = pages
-
-	return pagination, nil
+	return pages.Build(), nil
 }
 
 func (s *service) DescribePage(ctx context.Context, params *params.DescribePage) (*models.Page, error) {

@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"github.com/fox-gonic/fox/database"
 	"github.com/fox-gonic/fox/engine"
 
 	"github.com/miclle/space/models"
@@ -49,19 +48,21 @@ func (actions *Actions) CreatePage(c *engine.Context, args *CreatePageArgs) (*mo
 
 // DescribePagesArgs describe page detail args
 type DescribePagesArgs struct {
-	Lang    string `query:"lang"`
-	Version string `query:"version"`
-	Depth   string `query:"depth"` // all, root, default: all
+	Lang     string `query:"lang"`
+	Version  string `query:"version"`
+	Depth    int    `query:"depth"`
+	ParentID *int64 `query:"parent_id"`
 }
 
 // DescribePages describe pages
 // GET /api/spaces/:key/pages
-func (actions *Actions) DescribePages(c *engine.Context, args *DescribePagesArgs) (*database.Pagination[*models.Page], error) {
+func (actions *Actions) DescribePages(c *engine.Context, args *DescribePagesArgs) ([]*models.Page, error) {
 
 	var (
 		space  = c.MustGet("space").(*models.Space)
 		params = &params.DescribePages{
-			SpaceID: space.ID,
+			SpaceID:  space.ID,
+			ParentID: args.ParentID,
 		}
 	)
 
