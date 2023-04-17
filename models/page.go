@@ -36,6 +36,12 @@ func (t PageStatus) IsValid() error {
 	}
 }
 
+// PageQuery page unique keys
+type PageQuery struct {
+	Lang    string
+	Version string
+}
+
 // Page page meta model
 type Page struct {
 	ID            int64         `json:"id"        nestedset:"id"             gorm:"primaryKey;autoIncrement"`
@@ -64,6 +70,28 @@ func (page *Page) AfterFind(tx *gorm.DB) error {
 	if page.Content == nil {
 		page.Content = page.FallbackContent
 	}
+
+	if v, exist := tx.InstanceGet("query"); exist {
+		if query, ok := v.(*PageQuery); ok {
+			where := tx.Omit("body", "html")
+			if query.Lang != "" {
+				where = where.Where(&PageContent{Lang: query.Lang})
+			}
+			if query.Version != "" {
+				where = where.Where(&PageContent{Version: query.Version})
+			}
+
+			err := tx.InstanceSet("query", nil).
+				Joins("Content", where).
+				Where("`lft` < ? AND `rgt` > ?", page.Lft, page.Rgt).
+				Order("`lft` ASC").
+				Find(&page.Parents).Error
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -74,10 +102,12 @@ func (page *Page) MarshalJSON() ([]byte, error) {
 		*Alias
 		ParentID int64 `json:"parent_id"`
 		*PageContent
+		Space *Space `json:"space,omitempty"`
 	}{
 		ParentID:    page.ParentID.Int64,
 		Alias:       (*Alias)(page),
 		PageContent: (*PageContent)(page.Content),
+		Space:       page.Space,
 	})
 }
 

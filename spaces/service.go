@@ -255,7 +255,7 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 	}
 
 	if params.ParentID > 0 {
-		if err := database.Where("`id` = ?", page.ParentID).Find(&parent).Error; err != nil {
+		if err := database.Where("`id` = ?", params.ParentID).Find(&parent).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -379,10 +379,16 @@ func (s *service) DescribePage(ctx context.Context, params *params.DescribePage)
 		database = database.Joins("FallbackContent", database.Where(&models.PageContent{Lang: space.FallbackLang}))
 	}
 
-	err := database.Where("`space_pages`.`space_id` = ? AND `page_id` = ?", space.ID, params.PageID).Find(&page).Error
+	err := database.
+		InstanceSet("query", &models.PageQuery{Lang: lang}).
+		Where("`space_pages`.`space_id` = ? AND `page_id` = ?", space.ID, params.PageID).
+		Find(&page).Error
+
 	if err != nil {
 		return nil, err
 	}
+
+	page.Space = space
 
 	return page, nil
 }
