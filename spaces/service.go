@@ -268,9 +268,13 @@ func (s *service) CreatePage(ctx context.Context, params *params.CreatePage) (*m
 		}
 
 		if parent != nil {
-			nestedset.Create(tx, page, parent)
+			err = nestedset.Create(tx, page, parent)
 		} else {
-			nestedset.Create(tx, page, nil)
+			err = nestedset.Create(tx, page, nil)
+		}
+
+		if err != nil {
+			return err
 		}
 
 		content = &models.PageContent{
