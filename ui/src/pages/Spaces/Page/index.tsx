@@ -28,6 +28,9 @@ const PageDetail = observer(() => {
     data: page,
   } = useQuery<IPage>(['spaces.pages.get', page_id, query], () => Page.get(space.key, page_id, query), {
     enabled: !!page_id,
+    onSuccess(data) {
+      store.setCurrentPage(data);
+    },
   })
 
   if (isLoading) {

@@ -1,7 +1,7 @@
 import { GET, PATCH, POST } from './lib/http';
 import { Nullish } from './lib/types';
 
-import { IPage, IPageTree, PageStatus } from 'models';
+import { IPage, PageStatus } from 'models';
 
 export interface ICreatePageArgs {
   parent_id?:        number
@@ -24,10 +24,6 @@ export interface IGetPageParams {
 
 export function list(spaceKey: string, params?: IGetPageParams): Promise<IPage[]> {
   return GET(`/spaces/${spaceKey}/pages`, { params })
-}
-
-export function tree(spaceKey: string, params?: IGetPageParams): Promise<IPageTree> {
-  return GET(`/spaces/${spaceKey}/pages/tree`, { params })
 }
 
 export function get(spaceKey: string, id: string, params?: IGetPageParams): Promise<IPage> {

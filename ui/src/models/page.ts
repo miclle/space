@@ -31,15 +31,3 @@ export interface IPageParent {
   title:          string
   short_title:    string
 }
-
-export interface IPageTreeNode {
-  id:          string
-	lang:        string
-	version:     string
-	status:      PageStatus
-	title:       string
-	short_title: string
-  children:    IPageTreeNode[]
-}
-
-export type IPageTree = IPageTreeNode[]

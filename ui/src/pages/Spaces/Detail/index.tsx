@@ -24,6 +24,7 @@ const Spaces = observer(() => {
 
   const [menuItems, setMenuItems] = useState<ItemType[]>([]);
   const [menuSelectedKeys, setMenuSelectedKeys] = useState<string[]>([]);
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
 
   const [query, setQuery] = useQueryParams({
     lang: withDefault(StringParam, space.lang),
@@ -42,6 +43,11 @@ const Spaces = observer(() => {
     enabled: key !== '',
     initialData: [],
   })
+
+  const onExpandHandler = (expandedKeysValue: React.Key[]) => {
+    console.log(expandedKeysValue);
+    setExpandedKeys(expandedKeysValue)
+  }
 
   useEffect(() => {
     const items: ItemType[] = []
@@ -70,6 +76,10 @@ const Spaces = observer(() => {
 
     setMenuItems(items)
   }, [space, page_id]);
+
+  useEffect(() => {
+    setExpandedKeys(store.expandedKeys)
+  }, [store.expandedKeys]);
 
   useEffect(() => {
     setMenuSelectedKeys([location.pathname]);
@@ -127,7 +137,8 @@ const Spaces = observer(() => {
                   treeData={pages as any}
                   draggable={{ icon: false }}
                   blockNode
-                  autoExpandParent
+                  expandedKeys={expandedKeys}
+                  onExpand={onExpandHandler}
                   switcherIcon={
                     <span className="anticon anticon-down app-tree-switcher-icon" style={{ fontSize: 14 }}>
                       <MdKeyboardArrowDown size={14} />

@@ -1,17 +1,18 @@
 import React from "react";
-import { makeAutoObservable, runInAction } from "mobx";
+import { computed, makeAutoObservable, runInAction } from "mobx";
 
-import { IPageTree, ISpace } from "models";
+import { IPage, ISpace } from "models";
 import { Space } from "services";
 
 export class SpaceStore {
 
   space: ISpace = {} as ISpace
-
-  tree: IPageTree = []
+  currentPage?: IPage
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {
+      expandedKeys: computed,
+    });
   }
 
   async load(key: string) {
@@ -28,6 +29,25 @@ export class SpaceStore {
       this.space = info
     })
     return info
+  }
+
+  setCurrentPage(page: IPage) {
+    runInAction(() => {
+      this.currentPage = page
+    })
+  }
+
+  get expandedKeys(): React.Key[] {
+    const keys: React.Key[] = []
+
+    if (this.currentPage) {
+      this.currentPage.parents?.forEach((page) => {
+        keys.push(page.id)
+      })
+      keys.push(this.currentPage.id)
+    }
+
+    return keys
   }
 }
 
