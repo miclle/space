@@ -41,7 +41,7 @@ const NewPage = observer(() => {
   const handleFormFinish = async (values: Page.ICreatePageArgs) => {
     Page.create(space.key, values)
       .then((page: IPage) => {
-        client.prefetchQuery(['spaces.pages', space.key, page.lang]);
+        client.prefetchQuery(['spaces.pages', space.key, {lang: page.lang}]);
         navigate(`/spaces/${space.key}/pages/${page.id}?lang=${page.lang}`);
         notification.success({ message: 'Page created successfully' });
       })
