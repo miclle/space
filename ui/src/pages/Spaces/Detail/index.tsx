@@ -24,7 +24,8 @@ const Spaces = observer(() => {
 
   const [menuItems, setMenuItems] = useState<ItemType[]>([]);
   const [menuSelectedKeys, setMenuSelectedKeys] = useState<string[]>([]);
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+
+  const [treeSelectedKeys, setTreeSelectedKeys] = useState<React.Key[]>([]);
 
   const [query, setQuery] = useQueryParams({
     lang: withDefault(StringParam, space.lang),
@@ -44,9 +45,8 @@ const Spaces = observer(() => {
     initialData: [],
   })
 
-  const onExpandHandler = (expandedKeysValue: React.Key[]) => {
-    console.log(expandedKeysValue);
-    setExpandedKeys(expandedKeysValue)
+  const onSelectHandler = (selectedKeys: React.Key[]) => {
+    setTreeSelectedKeys(selectedKeys);
   }
 
   useEffect(() => {
@@ -75,11 +75,13 @@ const Spaces = observer(() => {
     )
 
     setMenuItems(items)
+    setTreeSelectedKeys([`${page_id}`])
   }, [space, page_id]);
 
   useEffect(() => {
-    setExpandedKeys(store.expandedKeys)
-  }, [store.expandedKeys]);
+    console.log(page_id);
+    setTreeSelectedKeys([page_id])
+  }, [page_id]);
 
   useEffect(() => {
     setMenuSelectedKeys([location.pathname]);
@@ -135,17 +137,26 @@ const Spaces = observer(() => {
                   showLine={true}
                   fieldNames={{ title: 'title', key: 'id' }}
                   treeData={pages as any}
-                  draggable={{ icon: false }}
                   blockNode
-                  expandedKeys={expandedKeys}
-                  onExpand={onExpandHandler}
+                  expandedKeys={store.expandedKeys}
+                  onExpand={(expandedKeys) => store.setExpandedKeys(expandedKeys)}
+                  defaultSelectedKeys={[page_id]}
+                  selectedKeys={treeSelectedKeys}
+                  onSelect={onSelectHandler}
                   switcherIcon={
                     <span className="anticon anticon-down app-tree-switcher-icon" style={{ fontSize: 14 }}>
                       <MdKeyboardArrowDown size={14} />
                     </span>
                   }
                   titleRender={(node: any) =>
-                    <Link to={`/spaces/${space.key}/pages/${node.id}`}>{node.short_title}</Link>
+                    <Link
+                      to={`/spaces/${space.key}/pages/${node.id}`}
+                      style={{ display: 'block' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTreeSelectedKeys([node.id]);
+                      }}
+                    >{node.short_title}</Link>
                   }
                 />
               </>

@@ -1,18 +1,20 @@
 import React from "react";
-import { computed, makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
+import { union } from "lodash";
 
 import { IPage, ISpace } from "models";
 import { Space } from "services";
 
 export class SpaceStore {
 
-  space: ISpace = {} as ISpace
-  currentPage?: IPage
+  space: ISpace = {} as ISpace;
+
+  currentPage?: IPage;
+
+  expandedKeys: React.Key[] = [];
 
   constructor() {
-    makeAutoObservable(this, {
-      expandedKeys: computed,
-    });
+    makeAutoObservable(this);
   }
 
   async load(key: string) {
@@ -34,21 +36,27 @@ export class SpaceStore {
   setCurrentPage(page: IPage) {
     runInAction(() => {
       this.currentPage = page
-    })
-  }
 
-  get expandedKeys(): React.Key[] {
-    const keys: React.Key[] = []
+      const keys: React.Key[] = [...this.expandedKeys]
 
-    if (this.currentPage) {
       this.currentPage.parents?.forEach((page) => {
         keys.push(page.id)
       })
-      keys.push(this.currentPage.id)
-    }
 
-    return keys
+      if (page.children_count > 0){
+        keys.push(this.currentPage.id)
+      }
+
+      this.expandedKeys = union(keys);
+    })
   }
+
+  setExpandedKeys(expandedKeys: React.Key[]) {
+    console.log(expandedKeys);
+
+    this.expandedKeys = expandedKeys
+  }
+
 }
 
 export const SpaceContext = React.createContext<SpaceStore>({} as any);
