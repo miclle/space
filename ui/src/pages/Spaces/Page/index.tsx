@@ -49,7 +49,7 @@ const PageDetail = observer(() => {
             items={[
               { title: <Link to={`/spaces/${space.key}`}>{space.name}</Link> },
               ...(page.parents?.map((parent) => ({ title: <Link to={`/spaces/${space.key}/pages/${parent.id}`}>{parent.short_title}</Link> })) || []),
-              { title: page.title },
+              { title: page.short_title },
             ]}
           />
         </Col>
@@ -68,6 +68,7 @@ const PageDetail = observer(() => {
         ghost={false}
         title={page.title}
         tags={<Tag color="blue">{page.lang}</Tag>}
+        style={{ padding: 0 }}
       >
         <Space>
           <Typography.Text type="secondary"><AiOutlineFileAdd />{dayjs.unix(page.created_at).format('YYYY-MM-DD HH:mm:ss')}</Typography.Text>
@@ -75,7 +76,7 @@ const PageDetail = observer(() => {
         </Space>
       </PageHeader>
 
-      <div className="page-content" style={{ padding: '0 16px' }} dangerouslySetInnerHTML={{ __html: page.html || '' }} />
+      <div className="page-content" dangerouslySetInnerHTML={{ __html: page.html || '' }} />
     </>
   );
 })

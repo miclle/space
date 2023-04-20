@@ -78,7 +78,7 @@ const EditPage = observer(() => {
         preserve={false}
         layout="vertical"
         onFinish={handleFormFinish}
-        style={{ padding: 16 }}
+        style={{ paddingBlock: 16 }}
       >
         <Form.Item name="title" label="Title" rules={[{ required: true }]} initialValue={page.title}>
           <Input placeholder="Give this page a title" />

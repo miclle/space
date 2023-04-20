@@ -52,8 +52,6 @@ export class SpaceStore {
   }
 
   setExpandedKeys(expandedKeys: React.Key[]) {
-    console.log(expandedKeys);
-
     this.expandedKeys = expandedKeys
   }
 

@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import { StringParam, useQueryParams, withDefault } from "use-query-params";
+import classNames from "classnames";
 import { Avatar, Empty, Layout, Menu, Select, Skeleton, Tree } from "antd";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { AiOutlinePlusSquare, AiOutlineSetting } from "react-icons/ai";
@@ -25,7 +26,6 @@ const Spaces = observer(() => {
   const [menuItems, setMenuItems] = useState<ItemType[]>([]);
   const [menuSelectedKeys, setMenuSelectedKeys] = useState<string[]>([]);
 
-  const [treeSelectedKeys, setTreeSelectedKeys] = useState<React.Key[]>([]);
 
   const [query, setQuery] = useQueryParams({
     lang: withDefault(StringParam, space.lang),
@@ -44,10 +44,6 @@ const Spaces = observer(() => {
     enabled: key !== '',
     initialData: [],
   })
-
-  const onSelectHandler = (selectedKeys: React.Key[]) => {
-    setTreeSelectedKeys(selectedKeys);
-  }
 
   useEffect(() => {
     const items: ItemType[] = []
@@ -75,13 +71,7 @@ const Spaces = observer(() => {
     )
 
     setMenuItems(items)
-    setTreeSelectedKeys([`${page_id}`])
   }, [space, page_id]);
-
-  useEffect(() => {
-    console.log(page_id);
-    setTreeSelectedKeys([page_id])
-  }, [page_id]);
 
   useEffect(() => {
     setMenuSelectedKeys([location.pathname]);
@@ -134,29 +124,20 @@ const Spaces = observer(() => {
                 </Select>
 
                 <Tree
+                  className="pagetree"
                   showLine={true}
                   fieldNames={{ title: 'title', key: 'id' }}
                   treeData={pages as any}
-                  blockNode
+                  selectable={false}
                   expandedKeys={store.expandedKeys}
                   onExpand={(expandedKeys) => store.setExpandedKeys(expandedKeys)}
-                  defaultSelectedKeys={[page_id]}
-                  selectedKeys={treeSelectedKeys}
-                  onSelect={onSelectHandler}
                   switcherIcon={
                     <span className="anticon anticon-down app-tree-switcher-icon" style={{ fontSize: 14 }}>
                       <MdKeyboardArrowDown size={14} />
                     </span>
                   }
                   titleRender={(node: any) =>
-                    <Link
-                      to={`/spaces/${space.key}/pages/${node.id}`}
-                      style={{ display: 'block' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTreeSelectedKeys([node.id]);
-                      }}
-                    >{node.short_title}</Link>
+                    <Link to={`/spaces/${space.key}/pages/${node.id}`} className={classNames({ current: `${node.id}` === page_id })}>{node.short_title}</Link>
                   }
                 />
               </>

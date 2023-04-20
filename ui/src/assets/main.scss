@@ -133,3 +133,10 @@ img {
   width: 580px;
   margin: 50px auto;
 }
+
+.pagetree {
+  a.current {
+    color: #000;
+    font-weight: 500;
+  }
+}
