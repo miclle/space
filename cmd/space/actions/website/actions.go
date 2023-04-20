@@ -48,7 +48,11 @@ func (actions *Actions) SetLang(c *engine.Context, args *SetLangArgs) (res inter
 // SetGlobal global middleware
 func (actions *Actions) SetGlobal(c *engine.Context) {
 
-	var params = &params.DescribeSpaces{}
+	lang := c.MustGet("lang").(string)
+
+	var params = &params.DescribeSpaces{
+		Lang: lang,
+	}
 
 	params.PageSize = 1000
 

@@ -15,8 +15,8 @@
             {{- range $space := . }}
             <li>
               <a class="dropdown-item" href="/{{.Lang}}/docs/{{$space.Key}}">
-                {{- with $space.Homepage -}}
-                {{- $space.Homepage.ShortTitle -}}
+                {{- with $space.HomepageContent -}}
+                {{- $space.HomepageContent.ShortTitle -}}
                 {{- else -}}
                 {{- $space.Name -}}
                 {{- end -}}

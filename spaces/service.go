@@ -135,16 +135,19 @@ func (s *service) DescribeSpaces(ctx context.Context, params *params.DescribeSpa
 		return nil, err
 	}
 
+	query := database.Select("title", "short_title")
+	if params.Lang != "" {
+		query = query.Where(&models.PageContent{Lang: params.Lang})
+	}
+
 	// Pagination
 	database = database.Scopes(pagination.Paginate())
 
-	// TODO(m) preload homepage space lang or fallback lang
-	if err := database.Preload("Homepage", func(db *gorm.DB) *gorm.DB {
-		if params.Lang != "" {
-			db = db.Where("`lang` = ?", params.Lang)
-		}
-		return db
-	}).Find(&pagination.Items).Error; err != nil {
+	database = database.
+		Joins("HomepageContent", query).
+		Joins("HomepageFallbackContent", query)
+
+	if err := database.Find(&pagination.Items).Error; err != nil {
 		return nil, err
 	}
 

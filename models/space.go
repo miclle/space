@@ -48,11 +48,23 @@ type Space struct {
 	CreatorID    int64       `json:"-"`
 
 	Homepage *Page `json:"homepage,omitempty" gorm:"foreignKey:HomepageID"`
+
+	// TODO(m) rename to Homepage
+	HomepageContent         *PageContent `json:"-" gorm:"foreignKey:HomepageID;references:PageID"`
+	HomepageFallbackContent *PageContent `json:"-" gorm:"foreignKey:HomepageID;references:PageID"`
 }
 
 // TableName user model table name
 func (Space) TableName() string {
 	return "spaces"
+}
+
+// AfterFind gorm after find callback
+func (space *Space) AfterFind(tx *gorm.DB) error {
+	if space.HomepageContent == nil {
+		space.HomepageContent = space.HomepageFallbackContent
+	}
+	return nil
 }
 
 // BeforeDelete gorm before delete callback
