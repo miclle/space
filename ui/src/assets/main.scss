@@ -135,8 +135,16 @@ img {
 }
 
 .pagetree {
-  a.current {
-    color: #000;
-    font-weight: 500;
+  .app-tree-title {
+    a {
+      display: block;
+      &:hover {
+        color: #1677ff;
+      }
+      &.current {
+        color: #000;
+        font-weight: 500;
+      }
+    }
   }
 }
