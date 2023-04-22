@@ -28,15 +28,15 @@ func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) 
 	var (
 		spaces = c.MustGet("spaces").([]*models.Space)
 		space  = c.MustGet("space").(*models.Space)
-		// pageTree = c.MustGet("pageTree").(models.PageTree)
-		page *models.Page
+		pages  = c.MustGet("pages").([]*models.Page)
+		page   *models.Page
 	)
 
 	data := ui.PageData{
 		Lang:   args.Lang,
 		Spaces: spaces,
 		Space:  space,
-		// PageTree: pageTree,
+		Pages:  pages,
 	}
 
 	page, err := actions.Spacer.DescribePage(c, &params.DescribePage{
@@ -63,8 +63,8 @@ func (actions *Actions) DescribePage(c *engine.Context, args *DescribePageArgs) 
 		return
 	}
 
-	// data.Title = page.Title
-	// data.Page = page
+	data.Title = page.Content.Title
+	data.Page = page
 
 	c.HTML(200, "page.html", data)
 }

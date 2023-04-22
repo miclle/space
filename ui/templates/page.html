@@ -1,6 +1,6 @@
 {{- $lang := .Lang -}}
 {{- $space := .Space -}}
-{{- $PageTree := .PageTree -}}
+{{- $Pages := .Pages -}}
 {{- $page := .Page -}}
 
 <!DOCTYPE html>
@@ -15,11 +15,17 @@
 
   <aside id="sidebar">
     <div class="brand">
-      <a href="/{{$lang}}/docs/{{$space.Key}}">{{ $space.ShortTitle }}</a>
+      <a href="/{{$lang}}/docs/{{$space.Key}}">
+        {{- with $space.Homepage.Content -}}
+        {{- $space.Homepage.Content.ShortTitle -}}
+        {{- else -}}
+        {{- $space.Name -}}
+        {{- end -}}
+      </a>
     </div>
 
     <!-- render pages tree nav -->
-    {{- template "pagetree" $PageTree }}
+    {{- template "pagetree" $Pages }}
   </aside>
 
   <main id="main">
@@ -32,25 +38,31 @@
               <a href="/">Home</a>
             </li>
             <li class="breadcrumb-item">
-              <a href="/{{$lang}}/docs/{{$space.Key}}">{{ $space.ShortTitle }}</a>
+              <a href="/{{$lang}}/docs/{{$space.Key}}">
+                {{- with $space.Homepage.Content -}}
+                {{- $space.Homepage.Content.ShortTitle -}}
+                {{- else -}}
+                {{- $space.Name -}}
+                {{- end -}}
+              </a>
             </li>
             {{- range $parent := $page.Parents }}
             <li class="breadcrumb-item">
-              <a href="/{{$parent.Lang}}/docs/{{$space.Key}}/{{$parent.PageID}}" title="{{$parent.Title}}">{{$parent.ShortTitle}}</a>
+              <a href="/{{$parent.Content.Lang}}/docs/{{$space.Key}}/{{$parent.ID}}" title="{{$parent.Content.Title}}">{{$parent.Content.ShortTitle}}</a>
             </li>
             {{- end }}
-            <li class="breadcrumb-item active" aria-current="page">{{$page.ShortTitle}}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{$page.Content.ShortTitle}}</li>
           </ol>
         </nav>
       </div>
 
       <div class="page">
-        <h1 class="page-title">{{$page.Title}}</h1>
+        <h1 class="page-title">{{$page.Content.Title}}</h1>
         <div class="page-meta">
-          <span>Validated on {{$page.UpdatedTime | date "02 Jan 2006"}} • Posted on {{$page.CreatedTime | date "02 Jan 2006"}}</span>
+          <span>Validated on {{timeUnix $page.Content.UpdatedAt 0 | date "02 Jan 2006"}} • Posted on {{timeUnix $page.Content.CreatedAt 0 | date "02 Jan 2006"}}</span>
         </div>
         <div class="page-body">
-          {{ $page.HTML | unescapeHTML }}
+          {{ $page.Content.HTML | unescapeHTML }}
         </div>
       </div>
 
