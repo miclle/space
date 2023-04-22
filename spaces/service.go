@@ -136,17 +136,15 @@ func (s *service) DescribeSpaces(ctx context.Context, params *params.DescribeSpa
 	}
 
 	{
-		var joinDB = s.Database.Select("title", "short_title")
-
 		// get homepage content
 		if params.Lang != "" {
-			database = database.Joins("HomepageContent", joinDB.Where(&models.PageContent{Lang: params.Lang}))
+			database = database.Joins("HomepageContent", s.Database.Select("title", "short_title").Where(&models.PageContent{Lang: params.Lang}))
 		} else {
-			database = database.Joins("HomepageContent", joinDB.Where("`HomepageContent`.`lang` = `spaces`.`lang`"))
+			database = database.Joins("HomepageContent", s.Database.Select("title", "short_title").Where("`HomepageContent`.`lang` = `spaces`.`lang`"))
 		}
 
 		// get fallback homepage content
-		database = database.Joins("HomepageFallbackContent", joinDB.Where("`HomepageFallbackContent`.`lang` = `spaces`.`fallback_lang`"))
+		database = database.Joins("HomepageFallbackContent", s.Database.Select("title", "short_title").Where("`HomepageFallbackContent`.`lang` = `spaces`.`fallback_lang`"))
 	}
 
 	// Pagination
