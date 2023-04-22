@@ -51,8 +51,8 @@ type PageData struct {
 	Title  string
 	Spaces []*models.Space
 	Space  *models.Space
-	// PageTree models.PageTree
-	Page *models.Page
+	Pages  []*models.Page
+	Page   *models.Page
 }
 
 func init() {

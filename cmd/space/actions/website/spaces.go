@@ -24,7 +24,7 @@ func (actions *Actions) DescribeSpace(c *engine.Context, args *DescribeSpaceArgs
 	var (
 		spaces = c.MustGet("spaces").([]*models.Space)
 		space  = c.MustGet("space").(*models.Space)
-		// pageTree = c.MustGet("pageTree").(models.PageTree)
+		pages  = c.MustGet("pages").([]*models.Page)
 	)
 
 	data := ui.PageData{
@@ -32,7 +32,7 @@ func (actions *Actions) DescribeSpace(c *engine.Context, args *DescribeSpaceArgs
 		Title:  space.Name,
 		Spaces: spaces,
 		Space:  space,
-		// PageTree: pageTree,
+		Pages:  pages,
 	}
 
 	c.HTML(200, "space.html", data)
@@ -53,7 +53,7 @@ func (actions *Actions) SetSpace(c *engine.Context, args *SetSpaceArgs) {
 
 	var (
 		space *models.Space
-		// pageTree models.PageTree
+		pages []*models.Page
 	)
 
 	// find space
@@ -77,11 +77,11 @@ func (actions *Actions) SetSpace(c *engine.Context, args *SetSpaceArgs) {
 		return
 	}
 
-	// pageTree, err = actions.Spacer.DescribePageTree(c, &params.DescribePages{
-	// 	SpaceID: space.ID,
-	// 	Lang:    args.Lang,
-	// 	Version: args.Version,
-	// })
+	pages, err = actions.Spacer.DescribePages(c, &params.DescribePages{
+		SpaceID: space.ID,
+		Lang:    args.Lang,
+		Version: args.Version,
+	})
 
 	if err != nil {
 		c.Logger.Error("get space pages failed", err)
@@ -90,5 +90,5 @@ func (actions *Actions) SetSpace(c *engine.Context, args *SetSpaceArgs) {
 	}
 
 	c.Set("space", space)
-	// c.Set("pageTree", pageTree)
+	c.Set("pages", pages)
 }

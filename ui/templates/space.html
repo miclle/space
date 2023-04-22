@@ -1,6 +1,6 @@
 {{- $lang := .Lang -}}
 {{- $space := .Space -}}
-{{- $PageTree := .PageTree -}}
+{{- $Pages := .Pages -}}
 
 
 <!DOCTYPE html>
@@ -15,11 +15,17 @@
 
   <aside id="sidebar">
     <div class="brand">
-      <a href="/{{$lang}}/docs/{{$space.Key}}">{{ $space.ShortTitle }}</a>
+      <a href="/{{$lang}}/docs/{{$space.Key}}">
+        {{- with $space.Homepage.Content -}}
+        {{- $space.Homepage.Content.ShortTitle -}}
+        {{- else -}}
+        {{- $space.Name -}}
+        {{- end -}}
+      </a>
     </div>
 
     <!-- render pages tree nav -->
-    {{- template "pagetree" $PageTree }}
+    {{- template "pagetree" $Pages }}
   </aside>
 
   <main id="main">
@@ -31,18 +37,24 @@
             <li class="breadcrumb-item">
               <a href="/">Home</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $space.ShortTitle }}</li>
+            <li class="breadcrumb-item active" aria-current="page">
+              {{- with $space.Homepage.Content -}}
+              {{- $space.Homepage.Content.ShortTitle -}}
+              {{- else -}}
+              {{- $space.Name -}}
+              {{- end -}}
+            </li>
           </ol>
         </nav>
       </div>
 
       <div class="page">
-        <h1 class="page-title">{{$space.Homepage.Title}}</h1>
+        <h1 class="page-title">{{$space.Homepage.Content.Title}}</h1>
         <div class="page-meta">
-          <span>Validated on {{$space.Homepage.UpdatedTime | date "02 Jan 2006"}} • Posted on {{$space.Homepage.CreatedTime | date "02 Jan 2006"}}</span>
+          <span>Validated on {{timeUnix $space.Homepage.Content.UpdatedAt 0 | date "02 Jan 2006"}} • Posted on {{timeUnix $space.Homepage.Content.CreatedAt 0 | date "02 Jan 2006"}}</span>
         </div>
         <div class="page-body">
-          {{ $space.Homepage.HTML | unescapeHTML }}
+          {{ $space.Homepage.Content.HTML | unescapeHTML }}
         </div>
       </div>
 

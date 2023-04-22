@@ -359,6 +359,10 @@ func (s *service) DescribePages(ctx context.Context, params *params.DescribePage
 		return nil, err
 	}
 
+	for _, page := range pages {
+		page.Space = space
+	}
+
 	return pages.Build(), nil
 }
 
