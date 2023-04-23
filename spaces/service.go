@@ -479,6 +479,11 @@ func (s *service) Serach(ctx context.Context, params *params.Search) (*database.
 		return nil, err
 	}
 
+	{
+		// TODO(m) get fallback content
+		// database = database.Joins("FallbackContent", s.Database.Where("`FallbackContent`.`lang` = `spaces`.`fallback_lang`"))
+	}
+
 	database = database.
 		Scopes(pagination.Paginate()).
 		Preload("Space")

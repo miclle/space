@@ -27,7 +27,7 @@
         <ul class="search-results-list">
           {{- range $page := .Items }}
           <li>
-            <h3><a href="/{{$page.Lang}}/docs/{{$page.Space.Key}}/{{$page.PageID}}">{{$page.Title}}</a></h3>
+            <h3><a href="/{{$page.Lang}}/docs/{{$page.Space.Key}}/{{$page.ID}}">{{$page.Title}}</a></h3>
             <p>{{abbrev 256 $page.Text}}</p>
           </li>
           {{- end }}

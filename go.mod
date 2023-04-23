@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/grokify/html-strip-tags-go v0.0.1
 	github.com/longbridgeapp/autocorrect v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.22
 	github.com/oklog/ulid/v2 v2.1.0

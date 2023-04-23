@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	strip "github.com/grokify/html-strip-tags-go"
 	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 )
@@ -138,6 +139,11 @@ type PageContent struct {
 // TableName user model table name
 func (PageContent) TableName() string {
 	return "space_page_contents"
+}
+
+// Text html plain text
+func (page *PageContent) Text() string {
+	return strip.StripTags(page.HTML)
 }
 
 // Pages pages type
