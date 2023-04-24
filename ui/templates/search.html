@@ -27,7 +27,15 @@
         <ul class="search-results-list">
           {{- range $page := .Items }}
           <li>
-            <h3><a href="/{{$page.Content.Lang}}/docs/{{$page.Content.SpaceID}}/{{$page.ID}}">{{$page.Content.Title}}</a></h3>
+            <span>
+              <small>
+                {{- range $i, $parent := $page.Parents -}}
+                {{- $parent.Content.ShortTitle -}}
+                {{- if lt (add $i 1) (len $page.Parents) }} › {{ end -}}
+                {{- end -}}
+              </small>
+            </span>
+            <h4><a href="/{{$page.Content.Lang}}/docs/{{$page.Content.Space.Key}}/{{$page.ID}}">{{$page.Content.Title}}</a></h4>
             <p>{{abbrev 256 $page.Content.Text}}</p>
           </li>
           {{- end }}
