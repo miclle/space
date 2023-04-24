@@ -49,7 +49,7 @@ type UpdatePage struct {
 
 // Search page params
 type Search struct {
-	database.Pagination[*models.PageContent]
+	database.Pagination[*models.Page]
 	Lang string
 	Q    string
 }

@@ -134,6 +134,7 @@ type PageContent struct {
 	DeletedAt soft_delete.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 
 	Space *Space `json:"space,omitempty"`
+	Page  *Page  `json:"page,omitempty"`
 }
 
 // TableName user model table name

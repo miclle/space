@@ -28,7 +28,7 @@ type Service interface {
 	DescribePage(context.Context, *params.DescribePage) (*models.Page, error)
 	UpdatePage(context.Context, *params.UpdatePage) (*models.Page, error)
 
-	Serach(context.Context, *params.Search) (*database.Pagination[*models.PageContent], error)
+	Serach(context.Context, *params.Search) (*database.Pagination[*models.Page], error)
 }
 
 // NewService return default implement spaces service
@@ -460,12 +460,13 @@ func (s *service) UpdatePage(ctx context.Context, params *params.UpdatePage) (*m
 	return page, err
 }
 
-func (s *service) Serach(ctx context.Context, params *params.Search) (*database.Pagination[*models.PageContent], error) {
+func (s *service) Serach(ctx context.Context, params *params.Search) (*database.Pagination[*models.Page], error) {
 
 	var (
 		database   = s.Database.WithContext(ctx)
 		pagination = &params.Pagination
 		q          = strings.TrimSpace(params.Q)
+		contents   []*models.PageContent
 	)
 
 	if len(q) == 0 {
@@ -474,22 +475,24 @@ func (s *service) Serach(ctx context.Context, params *params.Search) (*database.
 
 	like := fmt.Sprintf("%%%s%%", q)
 	database = database.Where("`lang` = ? AND (`title` LIKE ? OR `body` LIKE ?)", params.Lang, like, like)
-
-	if err := database.Model(&pagination.Items).Count(&pagination.Total).Error; err != nil {
+	if err := database.Model(&contents).Count(&pagination.Total).Error; err != nil {
 		return nil, err
-	}
-
-	{
-		// TODO(m) get fallback content
-		// database = database.Joins("FallbackContent", s.Database.Where("`FallbackContent`.`lang` = `spaces`.`fallback_lang`"))
 	}
 
 	database = database.
 		Scopes(pagination.Paginate()).
-		Preload("Space")
+		Preload("Space").
+		Preload("Page", func(db *gorm.DB) *gorm.DB {
+			return db.InstanceSet("query", &models.PageQuery{Lang: params.Lang})
+		})
 
-	if err := database.Find(&pagination.Items).Error; err != nil {
+	if err := database.Find(&contents).Error; err != nil {
 		return nil, err
+	}
+
+	for _, c := range contents {
+		c.Page.Content = c
+		pagination.Items = append(pagination.Items, c.Page)
 	}
 
 	return pagination, nil

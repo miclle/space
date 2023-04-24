@@ -27,8 +27,8 @@
         <ul class="search-results-list">
           {{- range $page := .Items }}
           <li>
-            <h3><a href="/{{$page.Lang}}/docs/{{$page.Space.Key}}/{{$page.ID}}">{{$page.Title}}</a></h3>
-            <p>{{abbrev 256 $page.Text}}</p>
+            <h3><a href="/{{$page.Content.Lang}}/docs/{{$page.Content.SpaceID}}/{{$page.ID}}">{{$page.Content.Title}}</a></h3>
+            <p>{{abbrev 256 $page.Content.Text}}</p>
           </li>
           {{- end }}
         </ul>
@@ -38,11 +38,11 @@
       {{- if gt .TotalPages 1 }}
       <nav aria-label="pagination" class="search-results-pagination">
         {{- if gt .Page 1 }}
-        <a href="/{{$lang}}/search?q={{$q}}&amp;page={{sub .Page 1}}">Previous</a>
+        <a href="/{{$lang}}/search?q={{$q}}&amp;page_size={{.PageSize}}&amp;page={{sub .Page 1}}">Previous</a>
         {{- end }}
 
         {{- if lt .Page .TotalPages }}
-        <a href="/{{$lang}}/search?q={{$q}}&amp;page={{add .Page 1}}">Next</a>
+        <a href="/{{$lang}}/search?q={{$q}}&amp;page_size={{.PageSize}}&amp;page={{add .Page 1}}">Next</a>
         {{- end }}
       </nav>
       {{- end }}

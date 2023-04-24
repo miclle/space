@@ -10,7 +10,7 @@ import (
 
 // SearchArgs search args
 type SearchArgs struct {
-	database.Pagination[*models.PageContent]
+	database.Pagination[*models.Page]
 	Lang string `uri:"lang"`
 	Q    string `query:"q"`
 }
