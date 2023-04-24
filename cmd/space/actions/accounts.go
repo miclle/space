@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"github.com/fox-gonic/fox/database"
 	"github.com/fox-gonic/fox/engine"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin/render"
@@ -104,4 +105,41 @@ func (actions *Actions) Overview(c *engine.Context) (*models.Account, error) {
 	account := c.MustGet("account").(*models.Account)
 
 	return account, nil
+}
+
+// DescribeAccountsArgs describe topics args
+type DescribeAccountsArgs struct {
+	Q string `query:"q"`
+	database.Pagination[*models.Account]
+}
+
+// DescribeAccounts describe accounts
+// GET /api/accounts
+func (actions *Actions) DescribeAccounts(c *engine.Context, args *DescribeAccountsArgs) (*database.Pagination[*models.Account], error) {
+
+	var params = &params.DescribeAccounts{}
+
+	return actions.Accounter.DescribeAccounts(c, params)
+}
+
+// UpdateAccountArgs describe topics args
+type UpdateAccountArgs struct {
+	Login    string             `uri:"login"`
+	Name     *string            `json:"name"`
+	Bio      *string            `json:"bio"`
+	Location *string            `json:"location"`
+	Status   *models.UserStatus `json:"status"`
+}
+
+// UpdateAccount update account
+// GET /api/accounts
+func (actions *Actions) UpdateAccount(c *engine.Context, args *UpdateAccountArgs) (*models.Account, error) {
+
+	var params = &params.UpdateAccount{
+		Login:  args.Login,
+		Name:   args.Name,
+		Status: args.Status,
+	}
+
+	return actions.Accounter.UpdateAccount(c, params)
 }

@@ -58,6 +58,7 @@ type UpdateAccount struct {
 	Name     *string
 	Bio      *string
 	Location *string
+	Status   *models.UserStatus
 }
 
 // CreateUnlockToken create unlock account token params

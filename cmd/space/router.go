@@ -91,6 +91,8 @@ func router(
 		group := router.Group("/api", api.AuthMiddleware)
 
 		group.GET("/accounts/overview", api.Overview)
+		group.GET("/accounts", api.DescribeAccounts)
+		group.PATCH("/accounts/:id", api.UpdateAccount)
 
 		group.POST("/spaces", api.CreateSpace)
 		group.GET("/spaces", api.DescribeSpaces)
