@@ -38,6 +38,11 @@ const NewPage = observer(() => {
   }
 
   const handleFormFinish = async (values: Page.ICreatePageArgs) => {
+
+    if (parentPage) {
+      values.parent_id = parentPage.id
+    }
+
     Page.create(space.key, values)
       .then((page: IPage) => {
         client.prefetchQuery(['spaces.pages', space.key, { lang: page.lang }]);
@@ -75,13 +80,6 @@ const NewPage = observer(() => {
         onFinish={handleFormFinish}
         style={{ padding: 16 }}
       >
-        {
-          parentPage &&
-          <Form.Item name="parent_id" noStyle initialValue={parentPage.id}>
-            <Input type="hidden" readOnly />
-          </Form.Item>
-        }
-
         <Form.Item name="title" label="Title" rules={[{ required: true }]}>
           <Input placeholder="Give this page a title" />
         </Form.Item>
