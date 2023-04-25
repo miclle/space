@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DecodedValueMap, NumberParam, StringParam, useQueryParams, withDefault } from "use-query-params";
 import { debounce } from "lodash";
 import { Button, Col, Form, Input, Layout, Row, Skeleton, Table } from "antd";
-import { AiOutlineSearch, AiOutlineSetting } from "react-icons/ai";
+import { AiOutlineSetting } from "react-icons/ai";
 
 import { ISpace } from "models";
 import { IPagination, PaginationDefault, Space } from "services";
@@ -33,7 +33,7 @@ const Spaces = observer(() => {
 
   const columns = [
     {
-      title: 'Space',
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
       render: (name: string, space: ISpace) => <Link to={`/spaces/${space.key}`}>{name}</Link>
@@ -63,17 +63,17 @@ const Spaces = observer(() => {
   return (
     <Layout.Content>
       <div className="container">
-        <PageHeader ghost={false} title="Spaces">
+        <PageHeader ghost={false} title="All spaces">
           <Row>
             <Col flex="auto">
               <Form layout="inline">
-
                 <Form.Item name="q" initialValue={query.q}>
-                  <Input allowClear style={{ width: 280 }} onChange={(e) => search({ ...query, q: e.target.value || undefined })} />
-                </Form.Item>
-
-                <Form.Item style={{ marginRight: 0 }}>
-                  <Button onClick={() => refetch()}><AiOutlineSearch /></Button>
+                  <Input.Search
+                    onChange={(e) => search({ ...query, q: e.target.value || undefined })}
+                    onSearch={(q) => refetch()}
+                    allowClear
+                    style={{ width: 280 }}
+                  />
                 </Form.Item>
               </Form>
             </Col>
