@@ -117,7 +117,10 @@ type DescribeAccountsArgs struct {
 // GET /api/accounts
 func (actions *Actions) DescribeAccounts(c *engine.Context, args *DescribeAccountsArgs) (*database.Pagination[*models.Account], error) {
 
-	var params = &params.DescribeAccounts{}
+	var params = &params.DescribeAccounts{
+		Pagination: args.Pagination,
+		Q:          args.Q,
+	}
 
 	return actions.Accounter.DescribeAccounts(c, params)
 }

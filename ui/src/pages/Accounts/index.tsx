@@ -1,27 +1,33 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React from "react";
 import { observer } from "mobx-react-lite";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { Layout, Menu, Skeleton, Table } from "antd";
-import { ItemType } from "antd/es/menu/hooks/useItems";
+import { Col, Form, Input, Layout, Row, Skeleton, Table } from "antd";
 import { Account, IPagination, PaginationDefault } from "services";
 import { IAccount } from "models";
 import { ColumnsType } from "antd/es/table";
+import { PageHeader } from "@ant-design/pro-components";
+import { DecodedValueMap, NumberParam, StringParam, useQueryParams, withDefault } from "use-query-params";
+import { debounce } from "lodash";
 
 const Accounts = observer(() => {
 
-  const location = useLocation();
+  const [query, setQuery] = useQueryParams({
+    page: withDefault(NumberParam, 1),
+    page_size: withDefault(NumberParam, 25),
 
-  const [menuItems, setMenuItems] = useState<ItemType[]>([]);
-  const [menuSelectedKeys, setMenuSelectedKeys] = useState<string[]>([]);
+    q: StringParam,
+  });
+
+  const search = debounce((query: DecodedValueMap<any>) => setQuery({ ...query, page: 1 }), 500);
 
   const {
     isLoading,
     data: pagination,
     isFetching,
-  } = useQuery<IPagination<IAccount>>(['accounts.list'], () => Account.list(), {
-    keepPreviousData: true,
+    refetch
+  } = useQuery<IPagination<IAccount>>(['accounts.list', query], () => Account.list(query), {
+    keepPreviousData: false,
     initialData: PaginationDefault,
   })
 
@@ -62,23 +68,26 @@ const Accounts = observer(() => {
   }
 
   return (
-    <>
-      <Layout.Sider
-        width={250}
-        theme="light"
-        className="app-sider-navigation app-sider-navigation-fixed"
-      >
-        <Menu
-          className="sider-navigation-menu"
-          mode="inline"
-          inlineIndent={8}
-          defaultSelectedKeys={[location.pathname]}
-          selectedKeys={menuSelectedKeys}
-          items={menuItems}
-        />
-      </Layout.Sider>
+    <Layout.Content>
+      <div className="container">
+        <PageHeader ghost={false} title="All accounts">
+          <Row>
+            <Col flex="auto">
+              <Form layout="inline">
+                <Form.Item name="q" initialValue={query.q}>
+                  <Input.Search
+                    onChange={(e) => search({ ...query, q: e.target.value || undefined })}
+                    onSearch={(q) => refetch()}
+                    allowClear
+                    style={{ width: 280 }}
+                  />
+                </Form.Item>
+              </Form>
+            </Col>
+            <Col />
+          </Row>
+        </PageHeader>
 
-      <Layout.Content style={{ marginLeft: 250, padding: 25 }}>
         <Table
           columns={columns}
           loading={isFetching}
@@ -92,8 +101,8 @@ const Accounts = observer(() => {
             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
           }}
         />
-      </Layout.Content>
-    </>
+      </div>
+    </Layout.Content>
   );
 })
 
