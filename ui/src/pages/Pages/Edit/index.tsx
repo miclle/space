@@ -1,13 +1,13 @@
 import { observer } from "mobx-react-lite";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { map } from "lodash";
 import { Breadcrumb, Button, Col, Empty, Form, Input, notification, Row, Select, Skeleton, Typography } from "antd";
 
-import Editor from "components/Editor";
+import CodeEditor from "components/CodeEditor";
 import { IPage } from 'models';
-import { AxiosResponse, IErrorMessage, Page } from "services";
+import { AxiosResponse, IErrorMessage, Markdown, Page } from "services";
 import { useSpaceContext } from "pages/Spaces/Detail/store";
-import { map } from "lodash";
 
 const EditPage = observer(() => {
 
@@ -106,7 +106,10 @@ const EditPage = observer(() => {
         </Row>
 
         <Form.Item name="body" rules={[{ required: true }]} initialValue={page.body}>
-          <Editor />
+          <CodeEditor
+            lang="markdown"
+            preview={(value) => Markdown.preview(value)}
+          />
         </Form.Item>
 
         <Form.Item name="status" noStyle initialValue="published">

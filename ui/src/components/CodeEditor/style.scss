@@ -5,7 +5,7 @@
   .cm-editor {
     border: 1px solid #d9d9d9;
     border-radius: 6px;
-    transition: all 0.3s,height 0s;
+    transition: all 0.3s, height 0s;
 
     &:hover {
       border-color: #4096ff;
@@ -32,11 +32,15 @@
     background-color: #dcdcdc;
   }
 
+  .cm-gutters {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+
   .cm-gutter,
   .cm-content {
-    min-height: 600px;
+    min-height: var(--minHeight, 600px);
     overflow: auto;
-    padding: 4px 0;
   }
 
   .cm-line {
@@ -45,8 +49,16 @@
 }
 
 .code-editor-preview {
-  min-height: 600px;
+  min-height: var(--minHeight, 600px);
   border: 1px solid #d9d9d9;
   border-radius: 6px;
   padding: 4px 11px;
+
+  >*:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  >*:first-child {
+    margin-top: 0 !important;
+  }
 }

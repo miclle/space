@@ -6,10 +6,9 @@ import { map } from "lodash";
 import { Button, Col, Form, Input, notification, Row, Typography } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 
-import { AxiosResponse, IErrorMessage, Page } from "services";
-
-import Editor from "components/Editor";
+import CodeEditor from "components/CodeEditor";
 import { IPage } from "models";
+import { AxiosResponse, IErrorMessage, Markdown, Page } from "services";
 import { useSpaceContext } from "pages/Spaces/Detail/store";
 
 const NewPage = observer(() => {
@@ -41,7 +40,7 @@ const NewPage = observer(() => {
   const handleFormFinish = async (values: Page.ICreatePageArgs) => {
     Page.create(space.key, values)
       .then((page: IPage) => {
-        client.prefetchQuery(['spaces.pages', space.key, {lang: page.lang}]);
+        client.prefetchQuery(['spaces.pages', space.key, { lang: page.lang }]);
         navigate(`/spaces/${space.key}/pages/${page.id}?lang=${page.lang}`);
         notification.success({ message: 'Page created successfully' });
       })
@@ -102,7 +101,10 @@ const NewPage = observer(() => {
         </Row>
 
         <Form.Item name="body" rules={[{ required: true }]}>
-          <Editor />
+          <CodeEditor
+            lang="markdown"
+            preview={(value) => Markdown.preview(value)}
+          />
         </Form.Item>
 
         <Form.Item name="status" noStyle initialValue="published">
