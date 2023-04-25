@@ -11,6 +11,7 @@ import localeData from 'dayjs/plugin/localeData'
 import weekday from 'dayjs/plugin/weekday'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import weekYear from 'dayjs/plugin/weekYear'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
 import 'dayjs/locale/zh-cn';
 
 import App from 'App';
@@ -25,6 +26,7 @@ dayjs.extend(localeData)
 dayjs.extend(weekOfYear)
 dayjs.extend(weekYear)
 dayjs.extend(relativeTime)
+dayjs.extend(localizedFormat)
 
 dayjs.locale('zh-cn')
 

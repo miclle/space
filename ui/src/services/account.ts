@@ -1,4 +1,6 @@
 import { GET, POST } from "./lib/http";
+import { Nullish } from "./lib/types";
+import { IPagination, IPaginationQuery } from "./pagination";
 
 import { IAccount } from "models";
 
@@ -23,4 +25,12 @@ export function signup(args: Partial<IAccount>): Promise<IAccount> {
  */
 export function signin(login: string, password: string): Promise<IAccount> {
   return POST<IAccount>('/accounts/signin', { login, password });
+}
+
+export interface IListTicketsArgs extends IPaginationQuery {
+  q?: string | Nullish
+}
+
+export function list(params?: IListTicketsArgs): Promise<IPagination<IAccount>> {
+  return GET('/accounts', { params })
 }
