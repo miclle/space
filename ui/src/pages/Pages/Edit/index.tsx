@@ -118,7 +118,7 @@ const EditPage = observer(() => {
 
         <Row gutter={12}>
           <Col flex="auto">
-            <Link to={`/spaces/${space.key}`}><Button>Cancel</Button></Link>
+            <Link to={`/spaces/${space.key}/pages/${page.id}`}><Button>Cancel</Button></Link>
           </Col>
           <Col>
             <Button onClick={() => submit('draft')}>Save as draft</Button>
