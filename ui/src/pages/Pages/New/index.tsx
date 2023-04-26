@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NumberParam, StringParam, useQueryParams } from "use-query-params";
 import { map } from "lodash";
-import { Button, Col, Form, Input, notification, Row, Typography } from "antd";
+import { Button, Col, Form, Input, notification, Row, Select, Typography } from "antd";
 import { PageHeader } from "@ant-design/pro-components";
 
 import CodeEditor from "components/CodeEditor";
@@ -93,9 +93,18 @@ const NewPage = observer(() => {
               <Input placeholder="Blank indicates the same as the page title" />
             </Form.Item>
           </Col>
-          <Col span={12}>
-
+          <Col span={6}>
+            {
+              space.multilingual &&
+              <Form.Item name="lang" label="Lang" initialValue={space.lang}>
+                <Select>
+                  <Select.Option value="en-US">English</Select.Option>
+                  <Select.Option value="zh-CN">简体中文</Select.Option>
+                </Select>
+              </Form.Item>
+            }
           </Col>
+          <Col span={6} />
         </Row>
 
         <Form.Item name="body" rules={[{ required: true }]}>

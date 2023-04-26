@@ -10,6 +10,7 @@ export interface ISpace {
 
   name:          string
   key:           string
+  multilingual:  boolean
   lang:          string
   fallback_lang: string
   homepage_id:   number

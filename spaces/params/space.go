@@ -10,6 +10,7 @@ import (
 type CreateSpace struct {
 	Name         string
 	Key          string
+	Multilingual bool
 	Lang         string
 	FallbackLang string
 	Description  string
@@ -37,6 +38,7 @@ type DescribeSpace struct {
 type UpdateSpace struct {
 	Key          string
 	Name         *string
+	Multilingual *bool
 	Lang         *string
 	FallbackLang *string
 	HomepageID   *int64

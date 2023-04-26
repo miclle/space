@@ -56,10 +56,14 @@ const PageDetail = observer(() => {
         <Col>
           <Space>
             <Link to={`/spaces/${space.key}/pages/${page.id}/edit`}><Button>Edit</Button></Link>
-            <Select defaultValue={page.lang}>
-              <Select.Option value="en-US">English</Select.Option>
-              <Select.Option value="zh-CN">简体中文</Select.Option>
-            </Select>
+
+            {
+              space.multilingual &&
+              <Select defaultValue={page.lang}>
+                <Select.Option value="en-US">English</Select.Option>
+                <Select.Option value="zh-CN">简体中文</Select.Option>
+              </Select>
+            }
           </Space>
         </Col>
       </Row>
@@ -67,7 +71,11 @@ const PageDetail = observer(() => {
       <PageHeader
         ghost={false}
         title={page.title}
-        tags={<Tag color="blue">{page.lang}</Tag>}
+        tags={
+          <>
+            {space.multilingual && <Tag color="blue">{page.lang}</Tag>}
+          </>
+        }
         style={{ padding: 0 }}
       >
         <Space>

@@ -114,14 +114,17 @@ const Spaces = observer(() => {
 
             {
               !pageTreeIsLoading && <>
-                <Select
-                  style={{ width: '100%', marginBottom: 12 }}
-                  defaultValue={query.lang}
-                  onChange={(lang) => setQuery({ ...query, lang })}
-                >
-                  <Select.Option value="en-US">English</Select.Option>
-                  <Select.Option value="zh-CN">简体中文</Select.Option>
-                </Select>
+                {
+                  space.multilingual &&
+                  <Select
+                    style={{ width: '100%', marginBottom: 12 }}
+                    defaultValue={query.lang}
+                    onChange={(lang) => setQuery({ ...query, lang })}
+                  >
+                    <Select.Option value="en-US">English</Select.Option>
+                    <Select.Option value="zh-CN">简体中文</Select.Option>
+                  </Select>
+                }
 
                 <Tree
                   className="pagetree"

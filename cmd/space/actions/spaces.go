@@ -17,6 +17,7 @@ import (
 type CreateSpaceArgs struct {
 	Name         string             `json:"name"`
 	Key          string             `json:"key"`
+	Multilingual bool               `json:"multilingual"`
 	Lang         string             `json:"lang"`
 	FallbackLang string             `json:"fallback_lang"`
 	Description  string             `json:"description"`
@@ -33,6 +34,7 @@ func (actions *Actions) CreateSpace(c *engine.Context, args *CreateSpaceArgs) (*
 	var params = &params.CreateSpace{
 		Name:         args.Name,
 		Key:          args.Key,
+		Multilingual: args.Multilingual,
 		Lang:         args.Lang,
 		FallbackLang: args.FallbackLang,
 		Description:  args.Description,
@@ -84,6 +86,7 @@ func (actions *Actions) DescribeSpace(c *engine.Context, args *DescribeSpaceArgs
 type UpdateSpaceArgs struct {
 	Key          string             `uri:"key"`
 	Name         *string            `json:"name"`
+	Multilingual *bool              `json:"multilingual"`
 	Lang         *string            `json:"lang"`
 	FallbackLang *string            `json:"fallback_lang"`
 	HomepageID   *int64             `json:"homepage_id"`
@@ -99,6 +102,7 @@ func (actions *Actions) UpdateSpace(c *engine.Context, args *UpdateSpaceArgs) (*
 	var params = &params.UpdateSpace{
 		Key:          args.Key,
 		Name:         args.Name,
+		Multilingual: args.Multilingual,
 		Lang:         args.Lang,
 		FallbackLang: args.FallbackLang,
 		HomepageID:   args.HomepageID,

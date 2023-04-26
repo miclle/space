@@ -39,6 +39,7 @@ type Space struct {
 	database.Model
 	Name         string      `json:"name"          gorm:"uniqueIndex;size:128"`
 	Key          string      `json:"key"           gorm:"uniqueIndex;size:128"`
+	Multilingual bool        `json:"multilingual"`                 // Enable multilingual
 	Lang         string      `json:"lang"          gorm:"size:32"` // default lang // TODO(m) enum type
 	FallbackLang string      `json:"fallback_lang" gorm:"size:32"` // fallback lang
 	HomepageID   int64       `json:"homepage_id"   gorm:"index"`

@@ -95,12 +95,15 @@ const EditPage = observer(() => {
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item name="lang" label="Lang" initialValue={page.lang}>
-              <Select>
-                <Select.Option value="en-US">English</Select.Option>
-                <Select.Option value="zh-CN">简体中文</Select.Option>
-              </Select>
-            </Form.Item>
+            {
+              space.multilingual &&
+              <Form.Item name="lang" label="Lang" initialValue={page.lang}>
+                <Select>
+                  <Select.Option value="en-US">English</Select.Option>
+                  <Select.Option value="zh-CN">简体中文</Select.Option>
+                </Select>
+              </Form.Item>
+            }
           </Col>
           <Col span={6} />
         </Row>

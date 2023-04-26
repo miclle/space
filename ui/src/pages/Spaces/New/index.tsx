@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Link, useNavigate } from 'react-router-dom';
 import { map } from 'lodash';
-import { Button, Form, Input, Layout, notification, Radio, Select, Space as AntSpace } from 'antd';
+import { Button, Form, Input, Layout, notification, Radio, Select, Space as AntSpace, Switch } from 'antd';
 import { PageHeader } from '@ant-design/pro-components';
 
 import { ISpace } from 'models';
@@ -12,6 +12,7 @@ const NewSpace = observer(() => {
   const navigate = useNavigate();
 
   const [form] = Form.useForm();
+  const [multilingual, setMultilingual] = useState(false);
 
   const handleFormFinish = async (values: Partial<ISpace>) => {
     Space.create(values)
@@ -76,25 +77,25 @@ const NewSpace = observer(() => {
             <Input.TextArea autoSize={{ minRows: 3 }} />
           </Form.Item>
 
+          <Form.Item name="multilingual" label="Enable Multilingual" valuePropName="checked" initialValue={multilingual}>
+            <Switch onChange={(value) => setMultilingual(value)} />
+          </Form.Item>
+
           <Form.Item name="lang" label="Default Language" initialValue="en-US">
-            <Select style={{ width: 200 }}>
+            <Select disabled={!multilingual} style={{ width: 200 }}>
               <Select.Option value="en-US">English</Select.Option>
               <Select.Option value="zh-CN">简体中文</Select.Option>
             </Select>
           </Form.Item>
 
           <Form.Item name="fallback_lang" label="Fallback Language" initialValue="en-US">
-            <Select style={{ width: 200 }}>
+            <Select disabled={!multilingual} style={{ width: 200 }}>
               <Select.Option value="en-US">English</Select.Option>
               <Select.Option value="zh-CN">简体中文</Select.Option>
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="status"
-            label="Status"
-            initialValue="offline"
-          >
+          <Form.Item name="status" label="Status" initialValue="offline">
             <Radio.Group>
               <Radio value="offline">Offline</Radio>
               <Radio value="online">Online</Radio>

@@ -212,6 +212,9 @@ func (s *service) UpdateSpace(ctx context.Context, params *params.UpdateSpace) (
 	if params.Name != nil {
 		space.Name = *params.Name
 	}
+	if params.Multilingual != nil {
+		space.Multilingual = *params.Multilingual
+	}
 	if params.Lang != nil {
 		space.Lang = *params.Lang
 	}
