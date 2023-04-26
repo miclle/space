@@ -4,11 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { DecodedValueMap, NumberParam, StringParam, useQueryParams, withDefault } from "use-query-params";
 import { debounce } from "lodash";
 import { Button, Col, Form, Input, Layout, Row, Skeleton, Table } from "antd";
-import { AiOutlineSetting } from "react-icons/ai";
+import { AiOutlineGlobal, AiOutlineSetting } from "react-icons/ai";
 
 import { ISpace } from "models";
 import { IPagination, PaginationDefault, Space } from "services";
 import { Link } from "react-router-dom";
+import { ColumnsType } from "antd/es/table";
 
 const Spaces = observer(() => {
 
@@ -31,22 +32,29 @@ const Spaces = observer(() => {
     initialData: PaginationDefault,
   })
 
-  const columns = [
+  const columns: ColumnsType<ISpace> = [
     {
       title: 'Name',
       dataIndex: 'name',
-      key: 'name',
       render: (name: string, space: ISpace) => <Link to={`/spaces/${space.key}`}>{name}</Link>
     },
     {
       title: 'Description',
       dataIndex: 'description',
-      key: 'description',
+      ellipsis: true,
+    },
+    {
+      title: <AiOutlineGlobal />,
+      key: 'multilingual',
+      width: 50,
+      align: 'center',
+      render: (multilingual: boolean) => multilingual && <AiOutlineGlobal />
     },
     {
       title: 'Status',
       dataIndex: 'status',
-      key: 'status',
+      width: 100,
+      align: 'center',
     },
     {
       title: <AiOutlineSetting />,
