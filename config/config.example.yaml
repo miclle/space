@@ -17,7 +17,7 @@ database:
   username: root
   password:
   database: space
-  encoding: utf8
+  encoding: utf8mb4
   max_idle_conns:
   max_open_conns:
   conn_max_life_time: # Second
