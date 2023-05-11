@@ -3,7 +3,7 @@ name: Build & Test
 on:
   push:
     paths-ignore:
-    - 'website/**'
+    - 'ui/**'
   pull_request:
     types:
     - opened
