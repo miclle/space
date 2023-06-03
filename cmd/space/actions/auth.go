@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/fox-gonic/fox/engine"
-	"github.com/fox-gonic/fox/errors"
+	"github.com/fox-gonic/fox/httperrors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin/render"
 	"github.com/samber/lo"
@@ -68,7 +68,7 @@ func (actions *Actions) AuthMiddleware(c *engine.Context) (res interface{}) {
 	}
 
 	if strings.HasPrefix(path, "/api") {
-		return errors.ErrUnauthorized
+		return httperrors.ErrUnauthorized
 	}
 
 	return render.Redirect{
